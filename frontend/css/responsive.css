@@ -1,0 +1,507 @@
+@media (max-width: 991.98px) {
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .navbar {
+    flex-wrap: wrap;
+    padding-block: 0.75rem;
+  }
+
+  .navbar-nav {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .dashboard-navbar {
+    align-items: flex-start;
+  }
+
+  .dashboard-nav {
+    justify-content: flex-start;
+  }
+
+  .dashboard-header-actions {
+    width: auto;
+  }
+
+  .dashboard-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .public-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .public-service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .public-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .appointment-detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .pet-detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .pet-care-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .appointments-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .history-card {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .history-status {
+    justify-self: start;
+  }
+
+  .booking-progress {
+    overflow-x: auto;
+    grid-template-columns: repeat(6, minmax(8rem, 1fr));
+    padding-bottom: 0.5rem;
+  }
+
+  .booking-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-summary {
+    position: static;
+  }
+
+  .booking-option-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-veterinarian-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .preventive-wellness {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .wellness-action {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+@media (min-width: 992px) {
+  .dashboard-navbar {
+    flex-wrap: nowrap;
+  }
+
+  .dashboard-nav {
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+  }
+
+  .dashboard-nav .nav-link {
+    padding-inline: 0.5rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  body {
+    font-size: 0.96rem;
+  }
+
+  .page-container {
+    padding-top: 1.5rem;
+  }
+
+  .card-header,
+  .card-body,
+  .card-footer {
+    padding: 1rem 1.125rem;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .public-navbar {
+    align-items: flex-start;
+  }
+
+  .public-nav {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    width: 100%;
+    order: 3;
+  }
+
+  .public-actions {
+    margin-left: auto;
+  }
+
+  .public-hero {
+    padding: 3.5rem 0;
+  }
+
+  .public-hero-media,
+  .public-hero-image {
+    min-height: 22rem;
+    height: 22rem;
+  }
+
+  .public-hero-note {
+    right: 0.75rem;
+  }
+
+  .public-section {
+    padding: 3.5rem 0;
+  }
+
+  .public-benefit-grid,
+  .public-steps {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .public-cta-inner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .public-cta-actions {
+    width: 100%;
+  }
+
+  .public-cta-actions .btn {
+    flex: 1;
+  }
+
+  .dashboard-navbar {
+    align-items: stretch;
+  }
+
+  .dashboard-nav {
+    gap: 0.25rem;
+  }
+
+  .dashboard-nav .nav-link {
+    padding-inline: 0.5rem;
+  }
+
+  .dashboard-header-actions {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .dashboard-header-actions .btn {
+    width: 100%;
+  }
+
+  .appointment-topline,
+  .appointment-actions,
+  .dashboard-banner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-banner {
+    padding: 1.5rem;
+  }
+
+  .dashboard-banner .btn {
+    width: 100%;
+  }
+
+  .care-list {
+    grid-template-columns: 1fr;
+  }
+
+  .history-card {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .history-status {
+    justify-self: start;
+  }
+
+  .profile-data-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-card .card-body,
+  .security-card .card-body {
+    padding: 1.25rem;
+  }
+
+  .profile-actions,
+  .security-password-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .profile-actions .btn,
+  .security-password-row .btn {
+    width: 100%;
+  }
+
+  .profile-logout {
+    display: inline-flex;
+    margin-top: 1.5rem;
+  }
+
+  .appointment-detail-card .card-body,
+  .appointment-summary-card .card-body {
+    padding: 1.25rem;
+  }
+
+  .appointment-detail-header,
+  .appointment-detail-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .appointment-detail-info {
+    grid-template-columns: 1fr;
+  }
+
+  .appointment-detail-actions .btn,
+  .appointment-summary-help .btn {
+    width: 100%;
+  }
+
+  .appointment-summary-value {
+    max-width: 60%;
+  }
+
+  .pet-detail-image {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  .pet-detail-card .card-body,
+  .pet-appointment-card .card-body,
+  .pet-health-card .card-body {
+    padding: 1.25rem;
+  }
+
+  .pet-detail-heading,
+  .pet-appointment-detail,
+  .pet-history-item {
+    grid-template-columns: 1fr;
+  }
+
+  .pet-detail-heading,
+  .pet-appointment-detail {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .pet-detail-data-grid,
+  .pet-health-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pet-detail-actions {
+    flex-direction: column-reverse;
+  }
+
+  .pet-detail-actions .btn {
+    width: 100%;
+  }
+
+  .pet-history-item {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .pet-history-item .completed {
+    justify-self: start;
+  }
+
+  .booking-content {
+    padding-top: 1.5rem;
+  }
+
+  .booking-header .navbar-brand {
+    margin-inline: auto;
+  }
+
+  .booking-back {
+    min-width: auto;
+  }
+
+  .booking-user {
+    font-size: 0;
+  }
+
+  .booking-fields,
+  .booking-payment-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-veterinarian-option {
+    min-height: 8rem;
+  }
+
+  .booking-fields .form-group:first-child,
+  .booking-payment-fields .form-group:first-child,
+  .booking-payment-fields .form-group:nth-child(2) {
+    grid-column: auto;
+  }
+
+  .booking-date-grid,
+  .booking-time-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .booking-date-grid .booking-choice:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .booking-actions,
+  .booking-confirmation-actions {
+    flex-direction: column-reverse;
+  }
+
+  .booking-actions .btn,
+  .booking-confirmation-actions .btn {
+    width: 100%;
+  }
+
+  .booking-payment-methods {
+    flex-wrap: wrap;
+  }
+
+  .preventive-wellness {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .wellness-action {
+    grid-column: auto;
+    width: 100%;
+  }
+
+  .pet-profile-image {
+    height: auto;
+  }
+
+  .pet-profile-card .card-body {
+    padding: 1.25rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .login-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .login-panel {
+    padding-inline: var(--space-5);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .page-title {
+    font-size: 1.8rem;
+  }
+
+  .page-subtitle,
+  .section-title {
+    font-size: 1.1rem;
+  }
+
+  .navbar-brand {
+    font-size: 1.35rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .login-layout {
+    display: block;
+  }
+
+  .login-visual {
+    min-height: 11rem;
+    max-height: 20rem;
+  }
+
+  .login-visual-image {
+    min-height: 11rem;
+    max-height: 20rem;
+  }
+
+  .login-visual-caption {
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .login-panel {
+    min-height: calc(100vh - 11rem);
+    padding: var(--space-8) var(--space-4);
+  }
+
+  .login-brand {
+    margin-bottom: var(--space-6);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .login-visual-caption {
+    display: none;
+  }
+
+  .login-panel {
+    min-height: calc(100vh - 8rem);
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-6);
+  }
+
+  .login-heading {
+    font-size: var(--font-size-xl);
+  }
+
+  .login-brand-tagline {
+    font-size: 0.65rem;
+  }
+}

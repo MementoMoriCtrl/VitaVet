@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Elegir veterinario | VitaVet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body class="booking-page">
+    <header class="site-header">
+      <nav class="navbar booking-header container-vet" aria-label="Navegación del registro de cita">
+        <a class="booking-back" href="registro-servicio.html">← Atrás</a>
+        <a class="navbar-brand" href="dashboard.html">VitaVet</a>
+        <span class="user-menu booking-user" aria-label="Usuario Sofía Perez">
+          <svg class="booking-user-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.42 0-8 2.24-8 5v2h16v-2c0-2.76-3.58-5-8-5Z" /></svg>
+          <span>Sofía Perez</span>
+        </span>
+      </nav>
+    </header>
+
+    <main class="booking-main">
+      <div class="page-container booking-content">
+        <header class="booking-intro page-header">
+          <h1 class="page-title">Elige tu veterinario</h1>
+          <p class="page-subtitle">Selecciona el profesional que prefieras para la atención de tu mascota.</p>
+        </header>
+
+        <nav class="booking-progress" aria-label="Progreso del registro">
+          <span class="booking-step is-complete"><span class="booking-step-marker">✓</span><span class="booking-step-label">Mascota</span></span>
+          <span class="booking-step is-complete"><span class="booking-step-marker">✓</span><span class="booking-step-label">Servicio</span></span>
+          <span class="booking-step is-current"><span class="booking-step-marker">03</span><span class="booking-step-label">Veterinario</span></span>
+          <span class="booking-step"><span class="booking-step-marker">04</span><span class="booking-step-label">Fecha y hora</span></span>
+          <span class="booking-step"><span class="booking-step-marker">05</span><span class="booking-step-label">Pago</span></span>
+          <span class="booking-step"><span class="booking-step-marker">06</span><span class="booking-step-label">Confirmación</span></span>
+        </nav>
+
+        <div class="booking-layout">
+          <section aria-labelledby="veterinarian-title">
+            <h2 id="veterinarian-title" class="section-title booking-section-title">Elige el veterinario que atenderá a tu mascota</h2>
+            <div class="booking-veterinarian-grid">
+              <label class="booking-option booking-veterinarian-option is-selected">
+                <input type="radio" name="veterinarian" value="Dra. Valeria Torres" checked />
+                <span class="booking-veterinarian-selection" aria-hidden="true">✓</span>
+                <span class="booking-veterinarian-photo booking-veterinarian-photo-valeria" aria-hidden="true">VT</span>
+                <span class="booking-veterinarian-info"><span class="booking-option-title">Dra. Valeria Torres</span><span class="booking-option-description">Medicina General</span><span class="booking-veterinarian-rating">★ 4.9 · 120 reseñas</span><span class="booking-veterinarian-availability">● Disponible</span></span>
+              </label>
+              <label class="booking-option booking-veterinarian-option">
+                <input type="radio" name="veterinarian" value="Dr. Sebastián Rojas" />
+                <span class="booking-veterinarian-selection" aria-hidden="true">✓</span>
+                <span class="booking-veterinarian-photo booking-veterinarian-photo-sebastian" aria-hidden="true">SR</span>
+                <span class="booking-veterinarian-info"><span class="booking-option-title">Dr. Sebastián Rojas</span><span class="booking-option-description">Medicina Preventiva</span><span class="booking-veterinarian-rating">★ 4.8 · 95 reseñas</span><span class="booking-veterinarian-availability">● Disponible</span></span>
+              </label>
+              <label class="booking-option booking-veterinarian-option">
+                <input type="radio" name="veterinarian" value="Dra. Andrea Mendoza" />
+                <span class="booking-veterinarian-selection" aria-hidden="true">✓</span>
+                <span class="booking-veterinarian-photo booking-veterinarian-photo-andrea" aria-hidden="true">AM</span>
+                <span class="booking-veterinarian-info"><span class="booking-option-title">Dra. Andrea Mendoza</span><span class="booking-option-description">Medicina Veterinaria</span><span class="booking-veterinarian-rating">★ 4.9 · 108 reseñas</span><span class="booking-veterinarian-availability">● Disponible</span></span>
+              </label>
+              <label class="booking-option booking-veterinarian-option">
+                <input type="radio" name="veterinarian" value="Dr. Carlos Ramírez" />
+                <span class="booking-veterinarian-selection" aria-hidden="true">✓</span>
+                <span class="booking-veterinarian-photo booking-veterinarian-photo-carlos" aria-hidden="true">CR</span>
+                <span class="booking-veterinarian-info"><span class="booking-option-title">Dr. Carlos Ramírez</span><span class="booking-option-description">Cirugía Veterinaria</span><span class="booking-veterinarian-rating">★ 4.7 · 86 reseñas</span><span class="booking-veterinarian-availability">● Disponible</span></span>
+              </label>
+            </div>
+            <div class="booking-actions"><a class="btn btn-secondary" href="registro-servicio.html">← Atrás</a><a id="continueVeterinarian" class="btn btn-primary" href="registro-fecha-hora.html">Continuar →</a></div>
+          </section>
+
+          <aside class="booking-summary" aria-labelledby="veterinarian-summary-title">
+            <h2 id="veterinarian-summary-title" class="booking-summary-title">Resumen de la cita</h2>
+            <div class="booking-summary-pet"><img class="booking-summary-image" src="../assets/images/mascotas/milo.jpg" alt="Milo, perro Golden Retriever" /><div><span class="booking-summary-pet-name">Milo</span><span class="booking-summary-pet-details">Perro · Golden Retriever · 4 años</span></div></div>
+            <div class="booking-summary-list"><div class="booking-summary-row"><span class="booking-summary-label">Servicio</span><span class="booking-summary-value">Consulta general</span></div><div class="booking-summary-row"><span class="booking-summary-label">Veterinario</span><span id="selectedVeterinarianSummary" class="booking-summary-value">Dra. Valeria Torres</span></div><div class="booking-summary-row"><span class="booking-summary-label">Fecha</span><span class="booking-summary-value">Por seleccionar</span></div><div class="booking-summary-row"><span class="booking-summary-label">Hora</span><span class="booking-summary-value">Por seleccionar</span></div></div>
+            <div class="booking-summary-total"><span>Total</span><span>S/ 80</span></div>
+          </aside>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer dashboard-footer"><div class="footer-content container-vet"><span class="footer-brand">VitaVet</span><nav class="footer-links" aria-label="Enlaces legales y de soporte"><a class="footer-link" href="#privacy">Privacidad</a><a class="footer-link" href="#terms">Términos</a><a class="footer-link" href="#support">Soporte</a></nav></div><p class="footer-copyright">© 2026 VitaVet Clínica Veterinaria &amp; Bienestar Animal. Todos los derechos reservados.</p></footer>
+    <script src="../js/registro-veterinario.js" defer></script>
+    <script src="../js/booking-state.js" defer></script>
+  </body>
+</html>

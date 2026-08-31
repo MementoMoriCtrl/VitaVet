@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Administra tus datos personales y la información de contacto de tu cuenta VitaVet."
+    />
+    <title>Mi perfil | VitaVet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body class="dashboard-page">
+    <header class="site-header">
+      <nav class="navbar dashboard-navbar container-vet" aria-label="Navegación principal">
+        <a class="navbar-brand" href="dashboard.html">VitaVet</a>
+
+        <div class="navbar-nav dashboard-nav">
+          <a class="nav-link" href="dashboard.html">Inicio</a>
+          <a class="nav-link" href="mascotas.html">Mis mascotas</a>
+          <a class="nav-link" href="citas.html">Mis citas</a>
+        </div>
+
+        <div class="header-actions dashboard-header-actions">
+          <a class="btn btn-primary" href="registro-cita.html">Registrar una cita</a>
+          <a class="user-menu" href="perfil.html" aria-current="page" aria-label="Ver perfil de Sofía Perez">
+            <svg class="user-menu-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path fill="currentColor" d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.42 0-8 2.24-8 5v2h16v-2c0-2.76-3.58-5-8-5Z" />
+            </svg>
+            <span>Sofía Perez</span>
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="dashboard-main">
+      <div class="page-container">
+        <header class="profile-intro page-header">
+          <h1 class="page-title">Mi perfil</h1>
+          <p class="page-subtitle">Administra tus datos personales y la información de contacto de tu cuenta.</p>
+        </header>
+
+        <div class="profile-layout">
+          <section class="card profile-card" aria-labelledby="personal-data-title">
+            <div class="card-body">
+              <h2 id="personal-data-title" class="profile-card-title">Datos personales</h2>
+              <div class="profile-data-grid">
+                <div class="profile-data-item">
+                  <span class="profile-data-label">Nombre completo</span>
+                  <span class="profile-data-value">Sofía Perez</span>
+                </div>
+                <div class="profile-data-item">
+                  <span class="profile-data-label">Correo electrónico</span>
+                  <span class="profile-data-value">sofia.perez@gmail.com</span>
+                </div>
+                <div class="profile-data-item">
+                  <span class="profile-data-label">Teléfono</span>
+                  <span class="profile-data-value">987 654 321</span>
+                </div>
+                <div class="profile-data-item">
+                  <span class="profile-data-label">DNI</span>
+                  <span class="profile-data-value">12345678</span>
+                </div>
+                <div class="profile-data-item">
+                  <span class="profile-data-label">Dirección</span>
+                  <span class="profile-data-value">Av. Los Olivos 123, Lima</span>
+                </div>
+              </div>
+
+              <div class="profile-account-section">
+                <h3 class="profile-section-title">Información de la cuenta</h3>
+                <div class="profile-data-grid">
+                  <div class="profile-data-item">
+                    <span class="profile-data-label">Usuario</span>
+                    <span class="profile-data-value">Sofía Perez</span>
+                  </div>
+                  <div class="profile-data-item">
+                    <span class="profile-data-label">Estado de la cuenta</span>
+                    <span class="profile-data-value profile-account-status">Activa</span>
+                  </div>
+                  <div class="profile-data-item">
+                    <span class="profile-data-label">Cliente desde</span>
+                    <span class="profile-data-value">2026</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="profile-actions">
+                <button class="btn btn-secondary" type="button">Cancelar</button>
+                <button class="btn btn-primary" type="button">Editar perfil</button>
+              </div>
+            </div>
+          </section>
+
+          <aside>
+            <section class="card security-card" aria-labelledby="security-title">
+              <div class="card-body">
+                <h2 id="security-title" class="security-title">Seguridad</h2>
+                <p class="security-description">Administra las opciones de seguridad de tu cuenta.</p>
+                <div class="security-password-row">
+                  <div>
+                    <span class="security-password-label">Contraseña</span>
+                    <span class="security-password-value">••••••••••••</span>
+                  </div>
+                  <button class="btn btn-outline" type="button">Cambiar contraseña</button>
+                </div>
+              </div>
+            </section>
+
+            <div class="profile-account-action">
+              <button id="logoutButton" class="btn-link profile-logout" type="button">Cerrar sesión</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer dashboard-footer">
+      <div class="footer-content container-vet">
+        <span class="footer-brand">VitaVet</span>
+        <nav class="footer-links" aria-label="Enlaces legales y de soporte">
+          <a class="footer-link" href="#privacy">Privacidad</a>
+          <a class="footer-link" href="#terms">Términos</a>
+          <a class="footer-link" href="#support">Soporte</a>
+        </nav>
+      </div>
+      <p class="footer-copyright">© 2026 VitaVet Clínica Veterinaria &amp; Bienestar Animal. Todos los derechos reservados.</p>
+    </footer>
+    <script src="../js/perfil.js" defer></script>
+  </body>
+</html>

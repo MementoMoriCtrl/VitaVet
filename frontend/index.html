@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="VitaVet, clínica veterinaria para gestionar el cuidado y bienestar de tus mascotas."
+    />
+    <title>VitaVet | Cuidado y bienestar animal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+  </head>
+  <body class="public-page">
+    <header class="site-header public-header">
+      <nav class="navbar public-navbar container-vet" aria-label="Navegación pública">
+        <a class="navbar-brand" href="index.html">VitaVet</a>
+        <div class="public-nav">
+          <a class="nav-link nav-link-active" href="#inicio" aria-current="page">Inicio</a>
+          <a class="nav-link" href="#servicios">Servicios</a>
+          <a class="nav-link" href="#nosotros">Nosotros</a>
+          <a class="nav-link" href="#contacto">Contacto</a>
+        </div>
+        <div class="public-actions">
+          <a class="btn btn-outline" href="pages/login.html">Iniciar sesión</a>
+          <a class="btn btn-primary" href="pages/registro.html">Crear cuenta</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="inicio" class="public-main">
+      <section class="public-hero" aria-labelledby="hero-title">
+        <div class="container-vet public-hero-grid">
+          <div class="public-hero-content">
+            <span class="public-eyebrow">Cuidamos a quienes más quieres</span>
+            <h1 id="hero-title" class="public-hero-title">El bienestar de tu mascota comienza aquí.</h1>
+            <p class="public-hero-text">Gestiona las citas veterinarias de tus mascotas de forma sencilla, segura y cercana con VitaVet.</p>
+            <div class="public-hero-actions">
+              <a class="btn btn-primary" href="pages/login.html">Agendar una cita</a>
+              <a class="btn btn-outline" href="#nosotros">Conoce VitaVet</a>
+            </div>
+          </div>
+          <div class="public-hero-media">
+            <img
+              class="public-hero-image"
+              src="assets/images/mascotas/golden-retriever-interior.jpg"
+              alt="Golden Retriever en un ambiente interior luminoso"
+            />
+            <div class="public-hero-note">
+              <strong>Atención personalizada</strong>
+              <span>Profesionales especializados para cada etapa.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="servicios" class="public-section" aria-labelledby="services-title">
+        <div class="container-vet">
+          <div class="public-section-heading">
+            <h2 id="services-title" class="public-section-title">Todo lo que tu mascota necesita</h2>
+            <p class="public-section-text">Encuentra servicios pensados para cuidar su salud y bienestar en cada etapa de su vida.</p>
+          </div>
+          <div class="public-service-grid">
+            <article class="public-service-card">
+              <span class="public-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3a6 6 0 0 0-6 6c0 2.21 1.2 4.14 3 5.18V21h6v-6.82c1.8-1.04 3-2.97 3-5a6 6 0 0 0-6-6Zm0 2a4 4 0 0 1 4 4c0 1.67-1.03 3.1-2.5 3.7L13 13v6h-2v-6l-.5-.3A4.01 4.01 0 0 1 12 5Z" /></svg></span>
+              <h3 class="public-service-title">Consulta general</h3>
+              <p class="public-service-description">Evaluación médica para cuidar la salud de tu mascota.</p>
+            </article>
+            <article class="public-service-card">
+              <span class="public-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10.01 10.01 0 0 0 12 2Zm0 2a8 8 0 1 1-8 8 8.01 8.01 0 0 1 8-8Zm-1 3v5.41l3.3 3.3 1.4-1.42L13 11.59V7Z" /></svg></span>
+              <h3 class="public-service-title">Control preventivo</h3>
+              <p class="public-service-description">Seguimiento y prevención para detectar cualquier problema a tiempo.</p>
+            </article>
+            <article class="public-service-card">
+              <span class="public-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a5 5 0 0 0-5 5c0 1.8.94 3.38 2.35 4.27A7 7 0 0 0 5 17.5V22h14v-4.5a7 7 0 0 0-4.35-6.23A5 5 0 0 0 12 2Zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm-5 14.5a5 5 0 0 1 10 0V20H7v-1.5Z" /></svg></span>
+              <h3 class="public-service-title">Vacunación</h3>
+              <p class="public-service-description">Mantén sus vacunas al día y protégelo de enfermedades.</p>
+            </article>
+            <article class="public-service-card">
+              <span class="public-service-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 9.01 9.01 0 0 0-9-9Zm0 2a7 7 0 1 1-7 7 7.01 7.01 0 0 1 7-7Zm-1 2v5.41l3.3 3.3 1.4-1.42-2.7-2.7V7Z" /></svg></span>
+              <h3 class="public-service-title">Desparasitación</h3>
+              <p class="public-service-description">Cuidados esenciales para mantenerlo saludable.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="nosotros" class="public-section public-benefits" aria-labelledby="benefits-title">
+        <div class="container-vet">
+          <div class="public-section-heading">
+            <h2 id="benefits-title" class="public-section-title">Una forma más simple de cuidar a tu mascota</h2>
+            <p class="public-section-text">Con VitaVet puedes organizar sus citas y mantener su bienestar bajo control desde un solo lugar.</p>
+          </div>
+          <div class="public-benefit-grid">
+            <article class="public-benefit"><span class="public-benefit-icon" aria-hidden="true">⌚</span><h3 class="public-benefit-title">Citas organizadas</h3><p class="public-benefit-text">Programa y consulta tus próximas atenciones fácilmente.</p></article>
+            <article class="public-benefit"><span class="public-benefit-icon" aria-hidden="true">✚</span><h3 class="public-benefit-title">Profesionales especializados</h3><p class="public-benefit-text">Elige al profesional que mejor se adapte a las necesidades de tu mascota.</p></article>
+            <article class="public-benefit"><span class="public-benefit-icon" aria-hidden="true">♥</span><h3 class="public-benefit-title">Bienestar preventivo</h3><p class="public-benefit-text">Anticípate a posibles problemas y mantén sus cuidados al día.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="public-section" aria-labelledby="steps-title">
+        <div class="container-vet">
+          <div class="public-section-heading"><h2 id="steps-title" class="public-section-title">Cuida a tu mascota en simples pasos</h2></div>
+          <div class="public-steps">
+            <article class="public-step"><span class="public-step-number">01</span><h3 class="public-step-title">Crea tu cuenta</h3><p class="public-step-text">Regístrate en VitaVet para comenzar a gestionar tus mascotas.</p></article>
+            <article class="public-step"><span class="public-step-number">02</span><h3 class="public-step-title">Registra tu cita</h3><p class="public-step-text">Selecciona tu mascota, servicio, veterinario, fecha y hora.</p></article>
+            <article class="public-step"><span class="public-step-number">03</span><h3 class="public-step-title">Disfruta una atención personalizada</h3><p class="public-step-text">Acude a tu cita y continúa cuidando su bienestar.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="public-cta" aria-labelledby="cta-title">
+        <div class="container-vet public-cta-inner">
+          <div><h2 id="cta-title" class="public-cta-title">¿Listo para cuidar mejor a tu mascota?</h2><p class="public-cta-text">Únete a VitaVet y lleva el cuidado veterinario de tus mascotas a otro nivel.</p></div>
+          <div class="public-cta-actions"><a class="btn btn-primary" href="pages/registro.html">Crear cuenta</a><a class="btn btn-outline" href="pages/login.html">Iniciar sesión</a></div>
+        </div>
+      </section>
+    </main>
+
+    <footer id="contacto" class="site-footer public-footer">
+      <div class="container-vet public-footer-grid">
+        <div><span class="footer-brand">VitaVet</span><p class="public-footer-description">Tu aliado en el cuidado y bienestar de tus mascotas.</p></div>
+        <div><h2 class="public-footer-title">Explora</h2><nav class="public-footer-list" aria-label="Secciones de VitaVet"><a class="public-footer-link" href="#inicio">Inicio</a><a class="public-footer-link" href="#servicios">Servicios</a><a class="public-footer-link" href="#nosotros">Nosotros</a><a class="public-footer-link" href="#contacto">Contacto</a></nav></div>
+        <div><h2 class="public-footer-title">Cuenta</h2><nav class="public-footer-list" aria-label="Acceso a la cuenta"><a class="public-footer-link" href="pages/login.html">Iniciar sesión</a><a class="public-footer-link" href="pages/registro.html">Crear cuenta</a></nav></div>
+        <div><h2 class="public-footer-title">Ayuda</h2><nav class="public-footer-list" aria-label="Enlaces de ayuda"><a class="public-footer-link" href="#privacy">Privacidad</a><a class="public-footer-link" href="#terms">Términos</a><a class="public-footer-link" href="#support">Soporte</a></nav></div>
+      </div>
+      <p class="public-footer-copyright">© 2026 VitaVet Clínica Veterinaria &amp; Bienestar Animal. Todos los derechos reservados.</p>
+    </footer>
+  </body>
+</html>

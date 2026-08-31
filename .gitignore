@@ -1,0 +1,21 @@
+# IDE y editor
+.vscode/
+.idea/
+*.iml
+
+# Java / Spring Boot
+*.class
+*.log
+target/
+build/
+.gradle/
+.gradle
+out/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos temporales
+*.tmp
+*.temp

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Perfiles y próximos cuidados de las mascotas de Sofia en VitaVet."
+    />
+    <title>Mis mascotas | VitaVet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body class="dashboard-page">
+    <header class="site-header">
+      <nav class="navbar dashboard-navbar container-vet" aria-label="Navegación principal">
+        <a class="navbar-brand" href="dashboard.html">VitaVet</a>
+
+        <div class="navbar-nav dashboard-nav">
+          <a class="nav-link" href="dashboard.html">Inicio</a>
+          <a class="nav-link nav-link-active" href="mascotas.html" aria-current="page">Mis mascotas</a>
+          <a class="nav-link" href="citas.html">Mis citas</a>
+        </div>
+
+        <div class="header-actions dashboard-header-actions">
+          <a class="btn btn-primary" href="registro-cita.html">Registrar una cita</a>
+          <a class="user-menu" href="perfil.html" aria-label="Ver perfil de Sofía Perez">
+            <svg class="user-menu-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path fill="currentColor" d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.42 0-8 2.24-8 5v2h16v-2c0-2.76-3.58-5-8-5Z" />
+            </svg>
+            <span>Sofía Perez</span>
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="dashboard-main">
+      <div class="page-container">
+        <header class="pets-page-intro page-header">
+          <h1 class="page-title">Mis mascotas</h1>
+          <p class="page-subtitle">Conoce el perfil y los próximos cuidados de tus mascotas.</p>
+        </header>
+
+        <section aria-labelledby="pets-title">
+          <h2 id="pets-title" class="section-title">Perfiles de tus mascotas</h2>
+          <div class="pets-grid">
+            <article class="card pet-profile-card">
+              <img
+                class="pet-profile-image"
+                src="../assets/images/mascotas/milo.jpg"
+                alt="Milo, perro Golden Retriever"
+              />
+              <div class="card-body">
+                <div class="pet-profile-header">
+                  <div>
+                    <h3 class="pet-profile-name">Milo</h3>
+                    <p class="pet-profile-summary">Perro · Golden Retriever</p>
+                  </div>
+                  <span class="badge badge-success">Saludable</span>
+                </div>
+
+                <div class="pet-profile-details">
+                  <div>
+                    <span class="pet-profile-detail-label">Tipo</span>
+                    <span class="pet-profile-detail-value">Perro</span>
+                  </div>
+                  <div>
+                    <span class="pet-profile-detail-label">Raza</span>
+                    <span class="pet-profile-detail-value">Golden Retriever</span>
+                  </div>
+                  <div>
+                    <span class="pet-profile-detail-label">Edad</span>
+                    <span class="pet-profile-detail-value">4 años</span>
+                  </div>
+                  <div>
+                    <span class="pet-profile-detail-label">Estado</span>
+                    <span class="pet-profile-detail-value">Saludable</span>
+                  </div>
+                </div>
+
+                <div class="pet-profile-care">
+                  <span class="pet-profile-care-title">Próxima cita</span>
+                  <p class="pet-profile-care-text">Consulta preventiva</p>
+                  <span class="pet-profile-care-date">03 septiembre 2026, 05:00 PM</span>
+                </div>
+
+                <a class="btn btn-outline pet-profile-action" href="perfil-mascota.html">Ver perfil</a>
+              </div>
+            </article>
+
+            <article class="card pet-profile-card">
+              <img
+                class="pet-profile-image"
+                src="../assets/images/mascotas/nala.jpg"
+                alt="Nala, gata Gato Persa"
+              />
+              <div class="card-body">
+                <div class="pet-profile-header">
+                  <div>
+                    <h3 class="pet-profile-name">Nala</h3>
+                    <p class="pet-profile-summary">Gato · Gato Persa</p>
+                  </div>
+                  <span class="badge badge-success">Saludable</span>
+                </div>
+
+                <div class="pet-profile-details">
+                  <div>
+                    <span class="pet-profile-detail-label">Tipo</span>
+                    <span class="pet-profile-detail-value">Gato</span>
+                  </div>
+                  <div>
+                    <span class="pet-profile-detail-label">Raza</span>
+                    <span class="pet-profile-detail-value">Gata Persa</span>
+                  </div>
+                  <div>
+                    <span class="pet-profile-detail-label">Edad</span>
+                    <span class="pet-profile-detail-value">2 años</span>
+                  </div>
+                  <div>
+                    <span class="pet-profile-detail-label">Estado</span>
+                    <span class="pet-profile-detail-value">Saludable</span>
+                  </div>
+                </div>
+
+                <div class="pet-profile-care">
+                  <span class="pet-profile-care-title">Próximo cuidado</span>
+                  <p class="pet-profile-care-text">Vacunación anual</p>
+                  <span class="pet-profile-care-date">Octubre 2026</span>
+                </div>
+
+                <a class="btn btn-outline pet-profile-action" href="#nala-profile">Ver perfil</a>
+              </div>
+            </article>
+
+            <article class="card add-pet-card">
+              <div class="add-pet-content">
+                <span class="add-pet-icon" aria-hidden="true">+</span>
+                <h3 class="add-pet-title">Registrar mascota</h3>
+                <p class="add-pet-text">
+                  Añade un nuevo compañero a tu perfil para gestionar su salud.
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="preventive-wellness" aria-labelledby="wellness-title">
+          <div class="wellness-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path fill="currentColor" d="M12 21s-7-4.35-9.5-8.5C.33 8.73 2.13 4 6.5 4c2.04 0 3.62 1.13 4.5 2.62C11.38 5.13 12.96 4 15 4c4.37 0 6.17 4.73 4 8.5C19 16.65 12 21 12 21Zm0-2.45c2.22-1.53 5.21-4.04 6.24-6.78C19.46 6.91 17.86 5.5 15 5.5c-1.72 0-2.87 1.23-3.55 2.62L12 9.25l.55-1.13C11.87 6.73 10.72 5.5 9 5.5c-2.86 0-4.46 1.41-3.24 6.27C6.79 14.51 9.78 17.02 12 18.55Z" />
+            </svg>
+          </div>
+          <div class="wellness-content">
+            <h2 id="wellness-title" class="wellness-title">Bienestar Preventivo</h2>
+            <p class="wellness-text">
+              La importancia de la medicina preventiva radica en detectar a tiempo posibles anomalías. Mantener al día las vacunas y revisiones periódicas de tus mascotas garantiza una vida más larga y feliz a su lado.
+            </p>
+          </div>
+          <button class="btn btn-outline wellness-action" type="button">Leer más consejos</button>
+        </section>
+      </div>
+    </main>
+
+    <footer class="site-footer dashboard-footer">
+      <div class="footer-content container-vet">
+        <span class="footer-brand">VitaVet</span>
+        <nav class="footer-links" aria-label="Enlaces legales y de soporte">
+          <a class="footer-link" href="#privacy">Privacidad</a>
+          <a class="footer-link" href="#terms">Términos</a>
+          <a class="footer-link" href="#support">Soporte</a>
+        </nav>
+      </div>
+      <p class="footer-copyright">© 2026 VitaVet Clínica Veterinaria &amp; Bienestar Animal. Todos los derechos reservados.</p>
+    </footer>
+  </body>
+</html>
