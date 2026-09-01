@@ -258,6 +258,61 @@ input:focus {
   font-weight: 600;
 }
 
+.dashboard-user-trigger {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dashboard-user-trigger::after {
+  margin-left: 0.15rem;
+  color: var(--color-primary);
+}
+
+.dashboard-user-trigger:hover,
+.dashboard-user-trigger:focus-visible {
+  color: var(--color-primary);
+}
+
+.dashboard-user-menu {
+  min-width: 12rem;
+  margin-top: 0.75rem !important;
+  padding: 0.45rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.dashboard-user-menu .dropdown-item {
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.dashboard-user-menu .dropdown-item:hover,
+.dashboard-user-menu .dropdown-item:focus {
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}
+
+.dashboard-user-menu .dropdown-divider {
+  border-color: var(--color-border);
+}
+
+.dashboard-user-menu .dashboard-logout-item {
+  color: var(--color-danger);
+}
+
+.dashboard-user-menu .dashboard-logout-item:hover,
+.dashboard-user-menu .dashboard-logout-item:focus {
+  color: var(--color-danger);
+  background-color: #fbe8e8;
+}
+
 .site-footer {
   background-color: #efeae1;
   border-top: 1px solid var(--color-border);
@@ -415,6 +470,7 @@ input:focus {
   flex: 1;
   justify-content: center;
   min-width: 0;
+  flex-direction: row;
 }
 
 .dashboard-nav .nav-link {
