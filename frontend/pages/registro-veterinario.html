@@ -1,3 +1,7 @@
+<!--
+  Tercera etapa del registro de cita.
+  Permite seleccionar al veterinario que atenderá la mascota.
+-->
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -31,6 +35,7 @@
           <p class="page-subtitle">Selecciona el profesional que prefieras para la atención de tu mascota.</p>
         </header>
 
+        <!-- Indicador de avance: esta página corresponde a la tercera etapa. -->
         <nav class="booking-progress" aria-label="Progreso del registro">
           <span class="booking-step is-complete"><span class="booking-step-marker">✓</span><span class="booking-step-label">Mascota</span></span>
           <span class="booking-step is-complete"><span class="booking-step-marker">✓</span><span class="booking-step-label">Servicio</span></span>
@@ -41,6 +46,7 @@
         </nav>
 
         <div class="booking-layout">
+          <!-- Selección del profesional que atenderá la mascota. -->
           <section aria-labelledby="veterinarian-title">
             <h2 id="veterinarian-title" class="section-title booking-section-title">Elige el veterinario que atenderá a tu mascota</h2>
             <div class="booking-veterinarian-grid">
@@ -72,9 +78,10 @@
             <div class="booking-actions"><a class="btn btn-secondary" href="registro-servicio.html">← Atrás</a><a id="continueVeterinarian" class="btn btn-primary" href="registro-fecha-hora.html">Continuar →</a></div>
           </section>
 
+          <!-- Resumen de las decisiones tomadas en el flujo hasta ahora. -->
           <aside class="booking-summary" aria-labelledby="veterinarian-summary-title">
             <h2 id="veterinarian-summary-title" class="booking-summary-title">Resumen de la cita</h2>
-            <div class="booking-summary-pet"><img class="booking-summary-image" src="../assets/images/mascotas/milo.jpg" alt="Milo, perro Golden Retriever" /><div><span class="booking-summary-pet-name">Milo</span><span class="booking-summary-pet-details">Perro · Golden Retriever · 4 años</span></div></div>
+            <div class="booking-summary-pet"><img class="booking-summary-image" src="../assets/images/mascotas/milo.jpg" alt="Oliver, perro Golden Retriever" /><div><span class="booking-summary-pet-name">Oliver</span><span class="booking-summary-pet-details">Perro · Golden Retriever · 4 años</span></div></div>
             <div class="booking-summary-list"><div class="booking-summary-row"><span class="booking-summary-label">Servicio</span><span class="booking-summary-value">Consulta general</span></div><div class="booking-summary-row"><span class="booking-summary-label">Veterinario</span><span id="selectedVeterinarianSummary" class="booking-summary-value">Dra. Valeria Torres</span></div><div class="booking-summary-row"><span class="booking-summary-label">Fecha</span><span class="booking-summary-value">Por seleccionar</span></div><div class="booking-summary-row"><span class="booking-summary-label">Hora</span><span class="booking-summary-value">Por seleccionar</span></div></div>
             <div class="booking-summary-total"><span>Total</span><span>S/ 80</span></div>
           </aside>

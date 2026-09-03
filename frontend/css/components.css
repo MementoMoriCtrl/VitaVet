@@ -1,3 +1,8 @@
+/* =====================================================
+  Botones y enlaces de acción
+  Define las variantes visuales y estados interactivos
+  de los botones reutilizados en VitaVet.
+  ===================================================== */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -79,6 +84,7 @@
   text-decoration: underline;
 }
 
+/* Enlaces de navegación y estado de la página actual. */
 .nav-link {
   position: relative;
   color: var(--color-text-secondary);
@@ -106,6 +112,10 @@
   border-radius: var(--radius-pill);
 }
 
+/* =====================================================
+  Formularios y controles
+  Organiza etiquetas, campos, foco y grupos de entrada.
+  ===================================================== */
 .form-group {
   display: flex;
   flex-direction: column;
@@ -159,6 +169,7 @@ input:focus {
   color: var(--color-text-secondary);
 }
 
+/* Tarjetas, encabezados, contenido y pies reutilizables. */
 .card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -183,6 +194,7 @@ input:focus {
   background-color: var(--color-surface-soft);
 }
 
+/* Indicadores compactos para estados como confirmado o saludable. */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -215,6 +227,9 @@ input:focus {
   color: var(--color-danger);
 }
 
+/* =====================================================
+  Encabezado, navegación y menú de usuario
+  ===================================================== */
 .site-header {
   background-color: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
@@ -313,6 +328,7 @@ input:focus {
   background-color: #fbe8e8;
 }
 
+/* Pie de página y sus enlaces informativos. */
 .site-footer {
   background-color: #efeae1;
   border-top: 1px solid var(--color-border);
@@ -387,6 +403,7 @@ input:focus {
   color: #a66d1d;
 }
 
+/* Contenedores y utilidades generales de estructura. */
 .container-vet {
   width: min(100%, 1200px);
   margin-inline: auto;
@@ -452,6 +469,10 @@ input:focus {
   justify-content: center;
 }
 
+/* =====================================================
+  Panel principal y citas
+  Organiza el dashboard, sus tarjetas y cuidados próximos.
+  ===================================================== */
 .dashboard-page {
   min-height: 100vh;
   display: flex;
@@ -515,6 +536,10 @@ input:focus {
   margin-bottom: 0;
 }
 
+/* =====================================================
+  Componentes del dashboard
+  Presenta la próxima cita, mascotas y cuidados próximos.
+  ===================================================== */
 .appointment-card {
   min-height: 21rem;
 }
@@ -746,6 +771,10 @@ input:focus {
   padding-bottom: 1.25rem;
 }
 
+/* =====================================================
+  Perfiles de mascotas
+  Define la cuadrícula, datos y acciones de cada mascota.
+  ===================================================== */
 .pets-page-intro {
   margin-bottom: 2.5rem;
 }
@@ -956,6 +985,10 @@ input:focus {
   gap: 1.5rem;
 }
 
+/* =====================================================
+  Listado e historial de citas
+  Organiza las tarjetas con datos y estados de las citas.
+  ===================================================== */
 .appointment-list-card {
   height: 100%;
 }
@@ -1083,6 +1116,10 @@ input:focus {
   justify-self: end;
 }
 
+/* =====================================================
+  Página pública
+  Estilos del inicio, servicios, beneficios y llamada a la acción.
+  ===================================================== */
 .public-page {
   min-height: 100vh;
   display: flex;
@@ -1418,6 +1455,10 @@ input:focus {
   text-align: center;
 }
 
+/* =====================================================
+  Detalle de cita y perfil de usuario
+  Presenta información ampliada, resúmenes y acciones.
+  ===================================================== */
 .appointment-detail-back {
   display: inline-flex;
   margin-bottom: 1.5rem;
@@ -1763,6 +1804,7 @@ input:focus {
   color: var(--color-danger);
 }
 
+/* Perfil detallado de la mascota, salud, cuidados e historial. */
 .pet-detail-back {
   display: inline-flex;
   margin-bottom: 1.5rem;
@@ -2006,6 +2048,10 @@ input:focus {
   margin-top: 2rem;
 }
 
+/* =====================================================
+  Flujo de registro de citas
+  Incluye progreso, opciones, resúmenes y confirmación.
+  ===================================================== */
 .booking-page {
   min-height: 100vh;
   display: flex;
@@ -2519,6 +2565,10 @@ input:focus {
   margin-top: 1.5rem;
 }
 
+/* =====================================================
+  Autenticación
+  Estilos compartidos por inicio de sesión y registro.
+  ===================================================== */
 .login-page {
   min-height: 100vh;
 }

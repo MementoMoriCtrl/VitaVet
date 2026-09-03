@@ -1,3 +1,7 @@
+<!--
+  Página de registro de usuario.
+  Solicita los datos personales, de contacto y de acceso a VitaVet.
+-->
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -21,6 +25,7 @@
   </head>
   <body class="login-page">
     <main class="login-layout">
+      <!-- Área visual compartida por las pantallas de autenticación. -->
       <section class="login-visual" aria-label="VitaVet, bienestar animal">
         <img
           class="login-visual-image"
@@ -32,6 +37,7 @@
         </p>
       </section>
 
+      <!-- Panel que contiene los datos necesarios para crear la cuenta. -->
       <section class="login-panel" aria-labelledby="register-title">
         <div class="login-content register-content">
           <header class="login-brand">
@@ -46,6 +52,8 @@
             </p>
           </div>
 
+          <!-- Formulario de registro con datos personales, contacto,
+            contraseñas y aceptación de términos. -->
           <form id="registerForm" class="login-form" novalidate>
             <div class="form-group">
               <label class="form-label" for="fullName">Nombre completo</label>

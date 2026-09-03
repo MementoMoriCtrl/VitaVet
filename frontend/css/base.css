@@ -1,3 +1,10 @@
+/*
+  Archivo: base.css
+  Propósito: establece las reglas globales, la tipografía base y los estilos
+  comunes para elementos HTML como imágenes, enlaces, controles y listas.
+*/
+
+/* Restablece medidas y márgenes para mantener un comportamiento uniforme. */
 * {
   box-sizing: border-box;
 }
@@ -7,6 +14,7 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Define la apariencia general y el fondo de todas las páginas. */
 body {
   margin: 0;
   font-family: var(--font-body);
@@ -16,12 +24,14 @@ body {
   background-color: var(--color-background);
 }
 
+/* Hace que las imágenes se adapten al ancho disponible. */
 img {
   max-width: 100%;
   display: block;
   height: auto;
 }
 
+/* Estilos y transición comunes para los enlaces y sus estados. */
 a {
   color: inherit;
   text-decoration: none;
@@ -33,6 +43,7 @@ a:focus {
   color: var(--color-primary);
 }
 
+/* Los controles de formulario heredan la tipografía del sitio. */
 button,
 input,
 select,
@@ -44,6 +55,7 @@ button {
   cursor: pointer;
 }
 
+/* Define la jerarquía visual de los títulos. */
 h1,
 h2,
 h3,
@@ -56,10 +68,12 @@ h6 {
   line-height: 1.2;
 }
 
+/* Normaliza el margen de los párrafos. */
 p {
   margin: 0;
 }
 
+/* Elimina estilos predeterminados de listas usadas en la navegación. */
 ul,
 ol {
   margin: 0;

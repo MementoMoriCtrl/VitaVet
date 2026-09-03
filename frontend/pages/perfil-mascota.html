@@ -1,10 +1,14 @@
+<!--
+  Perfil detallado de la mascota.
+  Presenta datos, salud, cuidados, citas e historial de Oliver.
+-->
 <!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Perfil y seguimiento de Milo en VitaVet." />
-    <title>Perfil de Milo | VitaVet</title>
+    <meta name="description" content="Perfil y seguimiento de Oliver en VitaVet." />
+    <title>Perfil de Oliver | VitaVet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
@@ -14,6 +18,7 @@
     <link rel="stylesheet" href="../css/responsive.css" />
   </head>
   <body class="dashboard-page">
+    <!-- Encabezado autenticado y navegación principal. -->
     <header class="site-header">
       <nav class="navbar dashboard-navbar container-vet" aria-label="Navegación principal">
         <a class="navbar-brand" href="dashboard.html">VitaVet</a>
@@ -36,17 +41,18 @@
       <div class="page-container">
         <a class="pet-detail-back" href="mascotas.html">← Volver a mis mascotas</a>
         <header class="pet-detail-intro page-header">
-          <h1 class="page-title">Perfil de Milo</h1>
+          <h1 class="page-title">Perfil de Oliver</h1>
           <p class="page-subtitle">Información y seguimiento de tu mascota.</p>
         </header>
 
+        <!-- Datos generales de la mascota y su próxima cita. -->
         <div class="pet-detail-layout">
           <section class="card pet-detail-card" aria-labelledby="milo-title">
-            <img class="pet-detail-image" src="../assets/images/mascotas/milo.jpg" alt="Milo, perro Golden Retriever" />
+            <img class="pet-detail-image" src="../assets/images/mascotas/milo.jpg" alt="Oliver, perro Golden Retriever" />
             <div class="card-body">
               <div class="pet-detail-heading">
                 <div>
-                  <h2 id="milo-title" class="pet-detail-name">Milo</h2>
+                  <h2 id="milo-title" class="pet-detail-name">Oliver</h2>
                   <p class="pet-detail-summary">Perro · Golden Retriever · 4 años</p>
                 </div>
                 <span class="badge badge-success">Saludable</span>
@@ -80,19 +86,22 @@
           </section>
         </div>
 
+        <!-- Resumen de la información de salud de la mascota. -->
         <section class="pet-health-section" aria-labelledby="health-title">
           <h2 id="health-title" class="pet-health-title">Información de salud</h2>
           <article class="card pet-health-card"><div class="card-body"><div class="pet-health-grid"><div><span class="pet-health-label">Última revisión</span><span class="pet-health-value">12 julio 2026</span></div><div><span class="pet-health-label">Estado general</span><span class="pet-health-value">Saludable</span></div><div><span class="pet-health-label">Vacunas</span><span class="pet-health-value">Al día</span></div><div><span class="pet-health-label">Desparasitación</span><span class="pet-health-value">Al día</span></div></div></div></article>
         </section>
 
+        <!-- Cuidados próximos programados para la mascota. -->
         <section class="pet-care-section" aria-labelledby="care-title">
           <h2 id="care-title" class="pet-care-title">Próximos cuidados</h2>
           <div class="pet-care-grid">
-            <article class="pet-care-card"><span class="pet-care-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path fill="currentColor" d="M12 2a5 5 0 0 0-5 5c0 1.8.94 3.38 2.35 4.27A7 7 0 0 0 5 17.5V22h14v-4.5a7 7 0 0 0-4.35-6.23A5 5 0 0 0 12 2Zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm-5 14.5a5 5 0 0 1 10 0V20H7v-1.5Z" /></svg></span><div><p class="pet-care-label">Vacunación anual</p><p class="pet-care-name">Milo</p><span class="pet-care-date">08 octubre 2026</span></div></article>
-            <article class="pet-care-card"><span class="pet-care-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 9.01 9.01 0 0 0-9-9Zm0 2a7 7 0 1 1-7 7 7.01 7.01 0 0 1 7-7Zm-1 2v5.41l3.3 3.3 1.4-1.42-2.7-2.7V7h-2Z" /></svg></span><div><p class="pet-care-label">Desparasitación</p><p class="pet-care-name">Milo</p><span class="pet-care-date">08 noviembre 2026</span></div></article>
+            <article class="pet-care-card"><span class="pet-care-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path fill="currentColor" d="M12 2a5 5 0 0 0-5 5c0 1.8.94 3.38 2.35 4.27A7 7 0 0 0 5 17.5V22h14v-4.5a7 7 0 0 0-4.35-6.23A5 5 0 0 0 12 2Zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm-5 14.5a5 5 0 0 1 10 0V20H7v-1.5Z" /></svg></span><div><p class="pet-care-label">Vacunación anual</p><p class="pet-care-name">Oliver</p><span class="pet-care-date">08 octubre 2026</span></div></article>
+            <article class="pet-care-card"><span class="pet-care-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 9.01 9.01 0 0 0-9-9Zm0 2a7 7 0 1 1-7 7 7.01 7.01 0 0 1 7-7Zm-1 2v5.41l3.3 3.3 1.4-1.42-2.7-2.7V7h-2Z" /></svg></span><div><p class="pet-care-label">Desparasitación</p><p class="pet-care-name">Oliver</p><span class="pet-care-date">08 noviembre 2026</span></div></article>
           </div>
         </section>
 
+        <!-- Historial reciente de servicios veterinarios. -->
         <section class="pet-history-section" aria-labelledby="history-title">
           <h2 id="history-title" class="pet-history-title">Historial reciente</h2>
           <div class="pet-history-list">

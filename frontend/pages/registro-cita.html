@@ -1,3 +1,7 @@
+<!--
+  Primera etapa del registro de cita.
+  Permite elegir la mascota que recibirá la atención.
+-->
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -29,6 +33,7 @@
           <h1 class="page-title">Registrar una cita</h1>
           <p class="page-subtitle">Programa una atención para tu mascota de forma sencilla y segura.</p>
         </header>
+        <!-- Indicador de las seis etapas del proceso de reserva. -->
         <nav class="booking-progress" aria-label="Progreso del registro">
           <span class="booking-step is-current"><span class="booking-step-marker">01</span><span class="booking-step-label">Mascota</span></span>
           <span class="booking-step"><span class="booking-step-marker">02</span><span class="booking-step-label">Servicio</span></span>
@@ -37,18 +42,19 @@
           <span class="booking-step"><span class="booking-step-marker">05</span><span class="booking-step-label">Pago</span></span>
           <span class="booking-step"><span class="booking-step-marker">06</span><span class="booking-step-label">Confirmación</span></span>
         </nav>
+        <!-- Primera etapa: selección de la mascota que recibirá la atención. -->
         <section aria-labelledby="pet-selection-title">
           <h2 id="pet-selection-title" class="section-title booking-section-title">¿Para quién es la cita?</h2>
           <div class="booking-option-grid">
             <label class="booking-option booking-pet-option is-selected">
               <input type="radio" name="pet" value="milo" checked />
-              <img class="booking-pet-image" src="../assets/images/mascotas/milo.jpg" alt="Milo, perro Golden Retriever" />
-              <span><span class="booking-pet-name">Milo</span><span class="booking-pet-details">Perro · Golden Retriever · 4 años</span></span>
+              <img class="booking-pet-image" src="../assets/images/mascotas/milo.jpg" alt="Oliver, perro Golden Retriever" />
+              <span><span class="booking-pet-name">Oliver</span><span class="booking-pet-details">Perro · Golden Retriever · 4 años</span></span>
             </label>
             <label class="booking-option booking-pet-option">
               <input type="radio" name="pet" value="nala" />
-              <img class="booking-pet-image" src="../assets/images/mascotas/nala.jpg" alt="Nala, gata Gato Persa" />
-              <span><span class="booking-pet-name">Nala</span><span class="booking-pet-details">Gato · Gato Persa · 2 años</span></span>
+              <img class="booking-pet-image" src="../assets/images/mascotas/nala.jpg" alt="Snow, gata Gato Persa" />
+              <span><span class="booking-pet-name">Snow</span><span class="booking-pet-details">Gato · Gato Persa · 2 años</span></span>
             </label>
           </div>
           <div class="booking-actions">

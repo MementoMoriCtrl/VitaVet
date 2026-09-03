@@ -1,3 +1,10 @@
+/*
+  Archivo: responsive.css
+  Propósito: adapta la distribución de VitaVet a tablets,
+  móviles y pantallas pequeñas mediante media queries.
+*/
+
+/* Ajustes para tablets y pantallas de hasta 991.98px. */
 @media (max-width: 991.98px) {
   .grid-2,
   .grid-3 {
@@ -112,6 +119,7 @@
   }
 }
 
+/* Restablece la distribución horizontal en pantallas grandes. */
 @media (min-width: 992px) {
   .dashboard-navbar {
     flex-wrap: nowrap;
@@ -127,6 +135,7 @@
   }
 }
 
+/* Ajustes generales para dispositivos móviles de hasta 767.98px. */
 @media (max-width: 767.98px) {
   body {
     font-size: 0.96rem;
@@ -429,6 +438,7 @@
   }
 }
 
+/* Ajusta el layout de autenticación para tablets. */
 @media (min-width: 768px) and (max-width: 991.98px) {
   .login-layout {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -439,6 +449,7 @@
   }
 }
 
+/* Ajustes para pantallas pequeñas de hasta 575.98px. */
 @media (max-width: 575.98px) {
   .page-title {
     font-size: 1.8rem;
@@ -454,6 +465,7 @@
   }
 }
 
+/* Adapta específicamente las pantallas de inicio de sesión en móvil. */
 @media (max-width: 767.98px) {
   .login-layout {
     display: block;
@@ -486,6 +498,7 @@
   }
 }
 
+/* Reduce elementos secundarios del login en pantallas muy pequeñas. */
 @media (max-width: 575.98px) {
   .login-visual-caption {
     display: none;

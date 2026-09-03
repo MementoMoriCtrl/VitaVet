@@ -1,3 +1,7 @@
+<!--
+  Página Mis citas.
+  Organiza las citas próximas y el historial de atenciones veterinarias.
+-->
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -24,6 +28,7 @@
     <link rel="stylesheet" href="../css/responsive.css" />
   </head>
   <body class="dashboard-page">
+    <!-- Encabezado autenticado con navegación principal y menú de usuario. -->
     <header class="site-header">
       <nav class="navbar dashboard-navbar container-vet" aria-label="Navegación principal">
         <a class="navbar-brand" href="dashboard.html">VitaVet</a>
@@ -62,6 +67,7 @@
           <p class="page-subtitle">Consulta tus próximas atenciones y mantén el cuidado de tus mascotas al día.</p>
         </header>
 
+        <!-- Tarjetas de las próximas atenciones, con sus datos y estados. -->
         <section aria-labelledby="upcoming-appointments-title">
           <h2 id="upcoming-appointments-title" class="section-title appointments-section-title">Próximas citas</h2>
           <div class="appointments-grid">
@@ -72,10 +78,10 @@
                     <img
                       class="appointment-list-pet-image"
                       src="../assets/images/mascotas/milo.jpg"
-                      alt="Milo, perro Golden Retriever"
+                      alt="Oliver, perro Golden Retriever"
                     />
                     <div>
-                      <span class="appointment-list-pet-name">Milo</span>
+                      <span class="appointment-list-pet-name">Oliver</span>
                       <span class="appointment-list-pet-details">Perro · Golden Retriever · 4 años</span>
                     </div>
                   </div>
@@ -118,11 +124,11 @@
                     <img
                       class="appointment-list-pet-image"
                       src="../assets/images/mascotas/nala.jpg"
-                      alt="Nala, gata Gato Persa"
+                      alt="Snow, gata Gato Persa"
                     />
                     <div>
-                      <span class="appointment-list-pet-name">Nala</span>
-                      <span class="appointment-list-pet-details">Gato · Gato Persa · 2 años</span>
+                      <span class="appointment-list-pet-name">Snow</span>
+                      <span class="appointment-list-pet-details">Gato · Gata Persa · 2 años</span>
                     </div>
                   </div>
                   <span class="scheduled">Programada</span>
@@ -159,6 +165,7 @@
           </div>
         </section>
 
+        <!-- Historial de citas ya realizadas por el usuario. -->
         <section class="history-section" aria-labelledby="history-title">
           <h2 id="history-title" class="section-title appointments-section-title">Historial de citas</h2>
           <article class="card history-card">
@@ -166,10 +173,10 @@
               <img
                 class="history-pet-image"
                 src="../assets/images/mascotas/milo.jpg"
-                alt="Milo, perro Golden Retriever"
+                alt="Oliver, perro Golden Retriever"
               />
               <div>
-                <span class="history-pet-name">Milo</span>
+                <span class="history-pet-name">Oliver</span>
                 <span class="history-pet-label">Mascota</span>
               </div>
             </div>

@@ -1,3 +1,8 @@
+/*
+  Archivo: variables.css
+  Propósito: define los valores visuales reutilizables del sistema VitaVet,
+  como colores, tipografías, tamaños, espaciados, radios y sombras.
+*/
 :root {
   /* Colores principales */
   --color-primary: #0b4038;
