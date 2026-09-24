@@ -46,7 +46,13 @@
         </header>
 
         <!-- Distribución del detalle completo y el resumen de la cita. -->
-        <div class="appointment-detail-layout">
+        <div class="card appointment-empty-state" id="appointmentDetailEmptyState" hidden>
+          <div class="card-body">
+            <p>No hay una cita seleccionada para mostrar.</p>
+            <a class="btn btn-primary" href="citas.html">Volver a mis citas</a>
+          </div>
+        </div>
+        <div class="appointment-detail-layout" id="appointmentDetailLayout">
           <!-- Información principal, estado y acciones de la cita. -->
           <article class="card appointment-detail-card" aria-labelledby="appointment-detail-title">
             <div class="card-body">
@@ -114,5 +120,6 @@
       <div class="footer-content container-vet"><span class="footer-brand">VitaVet</span><nav class="footer-links" aria-label="Enlaces legales y de soporte"><a class="footer-link" href="#privacy">Privacidad</a><a class="footer-link" href="#terms">Términos</a><a class="footer-link" href="#support">Soporte</a></nav></div>
       <p class="footer-copyright">© 2026 VitaVet Clínica Veterinaria &amp; Bienestar Animal. Todos los derechos reservados.</p>
     </footer>
+    <script src="../js/appointments.js" defer></script>
   </body>
 </html>

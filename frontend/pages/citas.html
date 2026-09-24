@@ -71,7 +71,7 @@
         <section aria-labelledby="upcoming-appointments-title">
           <h2 id="upcoming-appointments-title" class="section-title appointments-section-title">Próximas citas</h2>
           <div class="appointments-grid">
-            <article class="card appointment-list-card">
+            <article class="card appointment-list-card" hidden>
               <div class="card-body">
                 <div class="appointment-list-header">
                   <div class="appointment-list-pet">
@@ -117,7 +117,7 @@
               </div>
             </article>
 
-            <article class="card appointment-list-card">
+            <article class="card appointment-list-card" hidden>
               <div class="card-body">
                 <div class="appointment-list-header">
                   <div class="appointment-list-pet">
@@ -163,6 +163,12 @@
               </div>
             </article>
           </div>
+          <div class="card appointment-empty-state" id="appointmentsEmptyState" hidden>
+            <div class="card-body">
+              <p>Aún no tienes citas confirmadas.</p>
+              <a class="btn btn-primary" href="registro-cita.html">Registrar una cita</a>
+            </div>
+          </div>
         </section>
 
         <!-- Historial de citas ya realizadas por el usuario. -->
@@ -206,5 +212,7 @@
       <p class="footer-copyright">© 2026 VitaVet Clínica Veterinaria &amp; Bienestar Animal. Todos los derechos reservados.</p>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/perfil.js" defer></script>
+    <script src="../js/appointments.js" defer></script>
   </body>
 </html>

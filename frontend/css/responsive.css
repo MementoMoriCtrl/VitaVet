@@ -394,13 +394,8 @@
     grid-column: auto;
   }
 
-  .booking-date-grid,
   .booking-time-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .booking-date-grid .booking-choice:first-child {
-    grid-column: 1 / -1;
   }
 
   .booking-actions,
@@ -451,6 +446,11 @@
 
 /* Ajustes para pantallas pequeñas de hasta 575.98px. */
 @media (max-width: 575.98px) {
+  .booking-calendar-weekdays,
+  .booking-date-grid {
+    gap: 0.25rem;
+  }
+
   .page-title {
     font-size: 1.8rem;
   }

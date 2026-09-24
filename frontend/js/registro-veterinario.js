@@ -13,10 +13,14 @@ const updateSelectedVeterinarian = (selectedInput) => {
 const savedBooking = readBookingState();
 const initialVeterinarian = Array.from(veterinarianOptions).find(
   (input) => input.value === savedBooking.veterinarian
-) || document.querySelector('input[name="veterinarian"]:checked');
+) || null;
+
+veterinarianOptions.forEach((input) => {
+  input.checked = input === initialVeterinarian;
+  input.closest(".booking-veterinarian-option")?.classList.toggle("is-selected", input.checked);
+});
 
 if (initialVeterinarian) {
-  initialVeterinarian.checked = true;
   updateSelectedVeterinarian(initialVeterinarian);
 }
 

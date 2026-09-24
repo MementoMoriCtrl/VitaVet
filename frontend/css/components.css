@@ -985,6 +985,12 @@ input:focus {
   gap: 1.5rem;
 }
 
+.appointment-list-card[hidden],
+.appointment-detail-layout[hidden],
+.appointment-empty-state[hidden] {
+  display: none;
+}
+
 /* =====================================================
   Listado e historial de citas
   Organiza las tarjetas con datos y estados de las citas.
@@ -2201,8 +2207,15 @@ input:focus {
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-.booking-option:hover,
-.booking-option:focus-within,
+.booking-option:hover:not(.is-selected) {
+  box-shadow: var(--shadow-sm);
+}
+
+.booking-option:focus-within {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .booking-option.is-selected {
   border-color: var(--color-primary);
   background-color: #fbfdfc;
@@ -2513,6 +2526,31 @@ input:focus {
   grid-column: 1 / -1;
 }
 
+.booking-payment-fields[hidden],
+#onlinePaymentSection[hidden],
+.booking-clinic-message[hidden] {
+  display: none;
+}
+
+.booking-payment-demo-note {
+  margin: 0 0 1rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.payment-field-error {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+.booking-clinic-message {
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface);
+}
+
 .booking-confirmation {
   max-width: 680px;
   margin: 0 auto;
@@ -2719,4 +2757,81 @@ input:focus {
   min-height: 1.5rem;
   color: var(--color-danger);
   font-size: var(--font-size-sm);
+}
+
+/* Calendario de septiembre 2026 en el flujo de reservas. */
+.booking-calendar-weekdays,
+.booking-date-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.booking-calendar-month {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.booking-month-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-primary);
+  font: inherit;
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+}
+
+.booking-month-nav:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}
+
+.booking-month-nav:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.booking-calendar-weekdays {
+  margin-bottom: 0.5rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-align: center;
+}
+
+.booking-calendar-empty {
+  min-height: 3.25rem;
+}
+
+.booking-date-choice {
+  min-width: 0;
+  min-height: 3.25rem;
+  padding: 0.25rem;
+  font: inherit;
+}
+
+.booking-date-choice .booking-choice-day {
+  font-size: 0.625rem;
+}
+
+.booking-date-choice:focus-visible,
+.booking-time-choice:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.booking-date-choice.is-selected::after,
+.booking-time-choice.is-selected::after {
+  content: "✓";
+  margin-top: 0.15rem;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
 }
