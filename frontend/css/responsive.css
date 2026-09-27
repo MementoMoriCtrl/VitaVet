@@ -446,6 +446,10 @@
 
 /* Ajustes para pantallas pequeñas de hasta 575.98px. */
 @media (max-width: 575.98px) {
+  .public-service-grid {
+    grid-template-columns: 1fr;
+  }
+
   .booking-calendar-weekdays,
   .booking-date-grid {
     gap: 0.25rem;

@@ -10,6 +10,7 @@ const updateSelectedVeterinarian = (selectedInput) => {
   updateBookingSummaries(saveBookingState({ veterinarian: selectedInput.value }));
 };
 
+// Restaura la selección guardada y la actualiza cuando cambia el veterinario.
 const savedBooking = readBookingState();
 const initialVeterinarian = Array.from(veterinarianOptions).find(
   (input) => input.value === savedBooking.veterinarian

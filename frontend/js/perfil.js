@@ -2,6 +2,7 @@
 (() => {
   const logout = (event) => {
     event?.preventDefault();
+    // Elimina la reserva y selección temporales; conserva las citas confirmadas.
     sessionStorage.removeItem("vitaVetBooking");
     sessionStorage.removeItem("vitaVetSelectedAppointment");
     window.location.href = "../index.html";
@@ -15,6 +16,7 @@
   const profileLayout = document.querySelector(".pet-detail-layout");
   if (!profileLayout) return;
 
+  // Usa los datos existentes de Oliver o Snow según el parámetro de la URL.
   const profiles = {
     oliver: {
       name: "Oliver",
@@ -30,11 +32,13 @@
       image: "nala.jpg",
       type: "Gato",
       breed: "Gata Persa",
+      sex: "Hembra",
       age: "2 años",
       status: "Saludable",
       alt: "Snow, gata Persa"
     }
   };
+  // Selecciona el perfil indicado por ?mascota=; si falta, muestra Oliver.
   const requestedPet = new URLSearchParams(window.location.search).get("mascota")?.toLowerCase();
   const pet = profiles[requestedPet] || profiles.oliver;
   const isSnow = requestedPet === "snow";
@@ -49,14 +53,14 @@
     image.src = `../assets/images/mascotas/${pet.image}`;
     image.alt = pet.alt;
   }
-  if (summary) summary.textContent = `${pet.type} · ${pet.breed} · ${pet.age}`;
+  if (summary) summary.textContent = isSnow ? `${pet.breed} · ${pet.age}` : `${pet.type} · ${pet.breed} · ${pet.age}`;
   document.title = `Perfil de ${pet.name} | VitaVet`;
 
-  const valuesByLabel = { Tipo: pet.type, Raza: pet.breed, Edad: pet.age, Estado: pet.status };
+  const valuesByLabel = { Tipo: pet.type, Raza: pet.breed, Sexo: pet.sex, Edad: pet.age, Estado: pet.status };
   profileLayout.querySelectorAll(".pet-detail-data-grid > div").forEach((row) => {
     const label = row.querySelector(".pet-detail-label")?.textContent.trim();
     const value = row.querySelector(".pet-detail-value");
-    if (label === "Sexo" && isSnow) row.hidden = true;
+    if (label === "Sexo" && isSnow) row.hidden = false;
     if (value && valuesByLabel[label]) value.textContent = valuesByLabel[label];
   });
 

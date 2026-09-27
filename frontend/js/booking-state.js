@@ -1,6 +1,7 @@
 /* Estado temporal compartido por las etapas del registro de citas. */
 const bookingStorageKey = "vitaVetBooking";
 
+// Lee la reserva temporal compartida entre las etapas.
 const readBookingState = () => {
   try {
     const state = JSON.parse(sessionStorage.getItem(bookingStorageKey));
@@ -10,6 +11,7 @@ const readBookingState = () => {
   }
 };
 
+// Guarda en sessionStorage los cambios seleccionados en cada etapa.
 const saveBookingState = (updates) => {
   const nextState = { ...readBookingState(), ...updates };
   sessionStorage.setItem(bookingStorageKey, JSON.stringify(nextState));
@@ -17,6 +19,7 @@ const saveBookingState = (updates) => {
 };
 
 const prepareBookingEntry = () => {
+  // Una reserva nueva conserva la mascota; retomar conserva el estado existente.
   if (!window.location.pathname.endsWith("/registro-cita.html")) return;
   const query = new URLSearchParams(window.location.search);
   if (!query.has("retomar")) {
@@ -32,7 +35,7 @@ const prepareBookingEntry = () => {
 
 const petDetails = {
   milo: { name: "Oliver", image: "milo.jpg", description: "Perro · Golden Retriever · 4 años" },
-  nala: { name: "Snow", image: "nala.jpg", description: "Gato · Gato Persa · 2 años" }
+  nala: { name: "Snow", image: "nala.jpg", description: "Gata Persa · 2 años" }
 };
 
 const veterinarianSpecialties = {
@@ -44,6 +47,7 @@ const veterinarianSpecialties = {
 
 const calendarMonthNames = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 const calendarWeekdays = ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"];
+// Acepta fechas válidas del calendario en el formato usado por la reserva.
 const parseBookingDate = (date) => {
   const match = /^(\d{2}) ([a-záéíóú]+) (\d{4})$/i.exec(date || "");
   if (!match) return null;
@@ -53,7 +57,15 @@ const parseBookingDate = (date) => {
   if (month < 0 || day < 1 || day > new Date(year, month + 1, 0).getDate()) return null;
   return { day, month, year };
 };
-const isValidBookingDate = (date) => Boolean(parseBookingDate(date));
+const isValidBookingDate = (date) => {
+  const bookingDate = parseBookingDate(date);
+  if (!bookingDate) return false;
+  const today = new Date();
+  const bookingDay = bookingDate.year * 10000 + (bookingDate.month + 1) * 100 + bookingDate.day;
+  const currentDay = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+  return bookingDay >= currentDay;
+};
+// Limita la selección a los horarios ofrecidos en esta etapa.
 const validBookingTimes = ["09:00 AM", "10:30 AM", "12:00 PM", "03:00 PM", "05:00 PM"];
 const normalizePaymentMode = (value) => (["now", "clinic"].includes(value) ? value : undefined);
 const normalizePaymentMethod = (value) => {
@@ -64,6 +76,21 @@ const normalizePaymentMethod = (value) => {
   return undefined;
 };
 
+const getMissingBookingStep = (state) => {
+  const petId = state.petId || Object.keys(petDetails).find((id) => petDetails[id].name === state.pet);
+  if (!petId || !petDetails[petId]) return { label: "la mascota", href: "registro-cita.html?retomar=1" };
+  if (!state.service || !state.price) return { label: "el servicio", href: "registro-servicio.html" };
+  if (!veterinarianSpecialties[state.veterinarian]) return { label: "el veterinario", href: "registro-veterinario.html" };
+  if (!isValidBookingDate(state.date)) return { label: "la fecha", href: "registro-fecha-hora.html" };
+  if (!validBookingTimes.includes(state.time)) return { label: "la hora", href: "registro-fecha-hora.html" };
+  const paymentType = normalizePaymentMode(state.paymentType);
+  if (!paymentType) return { label: "la modalidad de pago", href: "registro-pago.html" };
+  if (paymentType === "now" && !normalizePaymentMethod(state.paymentMethod)) {
+    return { label: "el método de pago", href: "registro-pago.html" };
+  }
+  return null;
+};
+
 const restoreRadio = (name, value) => {
   document.querySelectorAll(`input[name="${name}"]`).forEach((input) => {
     input.checked = Boolean(value && input.value === value);
@@ -71,6 +98,7 @@ const restoreRadio = (name, value) => {
   });
 };
 
+// Refleja en cada etapa los datos guardados de la reserva.
 const updateBookingSummaries = (state) => {
   const pending = "Pendiente de selección";
   const pet = petDetails[state.petId || state.pet];
@@ -91,6 +119,8 @@ const updateBookingSummaries = (state) => {
     const label = row.querySelector(".booking-summary-label")?.textContent.trim();
     const value = row.querySelector(".booking-summary-value");
     if (!value) return;
+    const paymentType = normalizePaymentMode(state.paymentType);
+    const paymentMethod = normalizePaymentMethod(state.paymentMethod);
     const values = {
       Servicio: state.service,
       Veterinario: state.veterinarian,
@@ -100,8 +130,15 @@ const updateBookingSummaries = (state) => {
         ? `${state.date || pending}, ${state.time || pending}`
         : pending,
       Especialidad: veterinarianSpecialties[state.veterinarian],
+      "Modalidad de pago": paymentType === "now"
+        ? "Pagar ahora"
+        : paymentType === "clinic" ? "Pagar en la clínica" : undefined,
+      "Método de pago": paymentType === "now"
+        ? paymentMethod === "card" ? "Tarjeta" : paymentMethod === "yape" ? "Yape / Plin" : undefined
+        : undefined,
       "Precio estimado": state.price
     };
+    if (label === "Método de pago") row.style.display = paymentType === "clinic" ? "none" : "";
     if (Object.prototype.hasOwnProperty.call(values, label)) value.textContent = values[label] || pending;
   });
 
@@ -156,7 +193,9 @@ const syncBookingSelections = () => {
   if (dateGrid && !isValidBookingDate(state.date)) updates.date = undefined;
   if (timeGrid && !validBookingTimes.includes(state.time)) updates.time = undefined;
   const paymentMethodButtons = document.querySelectorAll(".booking-payment-method");
-  if (paymentMethodButtons.length && !normalizePaymentMethod(state.paymentMethod)) {
+  if (selectedPaymentType?.value === "clinic") {
+    updates.paymentMethod = "";
+  } else if (paymentMethodButtons.length && !normalizePaymentMethod(state.paymentMethod)) {
     const initiallySelectedMethod = Array.from(paymentMethodButtons).find((button) => button.getAttribute("aria-pressed") === "true")
       || paymentMethodButtons[0];
     updates.paymentMethod = initiallySelectedMethod.dataset.paymentMethod;
@@ -184,9 +223,12 @@ const syncBookingSelections = () => {
   const monthTitle = document.querySelector("#bookingMonthTitle");
   const previousMonthButton = document.querySelector("#previousBookingMonth");
   const nextMonthButton = document.querySelector("#nextBookingMonth");
-  let calendarYear = parseBookingDate(state.date)?.year || 2026;
-  let calendarMonth = parseBookingDate(state.date)?.month ?? 8;
+  const selectedCalendarDate = parseBookingDate(state.date);
+  const today = new Date();
+  let calendarYear = selectedCalendarDate?.year ?? today.getFullYear();
+  let calendarMonth = selectedCalendarDate?.month ?? today.getMonth();
 
+  // Genera el calendario del mes y restaura la selección guardada.
   const renderCalendar = () => {
     if (!dateGrid) return;
     if (monthTitle) {
@@ -208,6 +250,7 @@ const syncBookingSelections = () => {
       button.className = "booking-choice booking-date-choice";
       button.type = "button";
       button.dataset.date = date;
+      button.disabled = !isValidBookingDate(date);
       button.setAttribute("aria-label", date);
       button.setAttribute("aria-pressed", "false");
       const weekday = calendarWeekdays[(firstWeekday + day - 1) % 7];
@@ -229,6 +272,7 @@ const syncBookingSelections = () => {
     reflectCalendarSelection(readBookingState());
   };
 
+  // Cambia el mes visible y vuelve a generar sus días.
   const changeCalendarMonth = (offset) => {
     const nextMonth = new Date(calendarYear, calendarMonth + offset, 1);
     calendarYear = nextMonth.getFullYear();
@@ -299,7 +343,12 @@ const syncBookingSelections = () => {
   });
   document.querySelectorAll('input[name="paymentType"]').forEach((input) => {
     input.addEventListener("change", () => {
-      state = saveBookingState({ paymentType: input.value });
+      const updates = { paymentType: input.value };
+      if (input.value === "clinic") updates.paymentMethod = "";
+      else if (!normalizePaymentMethod(state.paymentMethod)) {
+        updates.paymentMethod = paymentMethodButtons[0]?.dataset.paymentMethod || "";
+      }
+      state = saveBookingState(updates);
       syncPaymentInterface(state);
     });
   });
@@ -328,6 +377,7 @@ const syncBookingSelections = () => {
     input.addEventListener("input", () => clearFieldError(input));
   });
 
+  // Valida los datos de pago de demostración; no realiza cobros.
   confirmBookingButton?.addEventListener("click", (event) => {
     const currentPayment = readBookingState();
     if (currentPayment.paymentType === "clinic") return;
@@ -363,3 +413,11 @@ const syncBookingSelections = () => {
 };
 
 syncBookingSelections();
+
+if (window.location.pathname.endsWith("/registro-confirmacion.html")) {
+  const missingStep = getMissingBookingStep(readBookingState());
+  if (missingStep) {
+    window.alert(`Para confirmar la cita, completa ${missingStep.label}. Te llevaremos a ese paso.`);
+    window.location.replace(missingStep.href);
+  }
+}
