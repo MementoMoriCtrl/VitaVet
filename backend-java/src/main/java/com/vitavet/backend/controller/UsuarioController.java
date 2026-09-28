@@ -1,7 +1,11 @@
 package com.vitavet.backend.controller;
 
+import com.vitavet.backend.model.Rol;
 import com.vitavet.backend.model.Usuario;
 import com.vitavet.backend.repository.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,14 +17,23 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioController(UsuarioRepository usuarioRepository) {
+    public UsuarioController(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
     public List<Usuario> listarUsuarios() {
         return usuarioRepository.findAll();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Usuario> obtenerUsuarioAutenticado(@AuthenticationPrincipal Jwt jwt) {
+        return usuarioRepository.findById(Integer.valueOf(jwt.getSubject()))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")
@@ -32,6 +45,10 @@ public class UsuarioController {
 
     @PostMapping
     public Usuario crearUsuario(@RequestBody Usuario usuario) {
+        if (usuario.getRol() == null) {
+            usuario.setRol(Rol.CLIENTE);
+        }
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         return usuarioRepository.save(usuario);
     }
 
@@ -45,7 +62,12 @@ public class UsuarioController {
                     usuario.setNombre(datosUsuario.getNombre());
                     usuario.setApellido(datosUsuario.getApellido());
                     usuario.setCorreo(datosUsuario.getCorreo());
-                    usuario.setPassword(datosUsuario.getPassword());
+                    if (datosUsuario.getRol() != null) {
+                        usuario.setRol(datosUsuario.getRol());
+                    }
+                    if (datosUsuario.getPassword() != null && !datosUsuario.getPassword().isBlank()) {
+                        usuario.setPassword(passwordEncoder.encode(datosUsuario.getPassword()));
+                    }
                     usuario.setTelefono(datosUsuario.getTelefono());
 
                     return ResponseEntity.ok(usuarioRepository.save(usuario));

@@ -1,6 +1,7 @@
 package com.vitavet.backend.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "usuario")
@@ -25,6 +26,10 @@ public class Usuario {
 
     @Column(name = "telefono", nullable = false, length = 20)
     private String telefono;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rol", nullable = false, length = 20)
+    private Rol rol = Rol.CLIENTE;
 
     public Usuario() {
     }
@@ -61,6 +66,7 @@ public class Usuario {
         this.correo = correo;
     }
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public String getPassword() {
         return password;
     }
@@ -75,5 +81,13 @@ public class Usuario {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
     }
 }

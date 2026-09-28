@@ -6,4 +6,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MascotaRepository extends JpaRepository<Mascota, Integer> {
+    java.util.List<Mascota> findByIdUsuario(Integer idUsuario);
+
+    java.util.Optional<Mascota> findByIdMascotaAndIdUsuario(Integer idMascota, Integer idUsuario);
+
+    boolean existsByIdMascotaAndIdUsuario(Integer idMascota, Integer idUsuario);
 }
