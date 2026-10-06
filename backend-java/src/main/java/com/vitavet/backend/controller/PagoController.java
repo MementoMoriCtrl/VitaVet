@@ -52,13 +52,24 @@ public class PagoController {
             @RequestBody Pago datos,
             @AuthenticationPrincipal Jwt jwt) {
 
-        if (!JwtIdentity.isAdmin(jwt)
-                && !citaRepository.existsByIdCitaAndUsuarioId(datos.getIdCita(), JwtIdentity.userId(jwt))) {
-            return ResponseEntity.notFound().build();
-        }
-
         return buscarPorIdentidad(id, jwt)
                 .map(pago -> {
+                    if (!JwtIdentity.isAdmin(jwt)) {
+                        if (!citaRepository.existsByIdCitaAndUsuarioId(
+                                datos.getIdCita(), JwtIdentity.userId(jwt))) {
+                            return ResponseEntity.notFound().<Pago>build();
+                        }
+                        if (datos.getIdCita() == null || !datos.getIdCita().equals(pago.getIdCita())) {
+                            return ResponseEntity.status(403).<Pago>build();
+                        }
+                        if (!java.util.Objects.equals(datos.getMonto(), pago.getMonto())
+                                || !java.util.Objects.equals(datos.getEstado(), pago.getEstado())) {
+                            return ResponseEntity.status(403).<Pago>build();
+                        }
+                        pago.setModalidad(datos.getModalidad());
+                        pago.setMetodo(datos.getMetodo());
+                        return ResponseEntity.ok(pagoRepository.save(pago));
+                    }
                     pago.setIdCita(datos.getIdCita());
                     pago.setModalidad(datos.getModalidad());
                     pago.setMetodo(datos.getMetodo());
@@ -72,6 +83,9 @@ public class PagoController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Integer id, @AuthenticationPrincipal Jwt jwt) {
+        if (!JwtIdentity.isAdmin(jwt)) {
+            return ResponseEntity.status(403).build();
+        }
         return buscarPorIdentidad(id, jwt)
                 .map(pago -> {
                     pagoRepository.delete(pago);

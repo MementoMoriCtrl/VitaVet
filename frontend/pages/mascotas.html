@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="../css/base.css" />
     <link rel="stylesheet" href="../css/components.css" />
     <link rel="stylesheet" href="../css/responsive.css" />
-  </head>
+  <script src="../js/auth.js"></script></head>
   <body class="dashboard-page">
     <!-- Encabezado autenticado y navegación hacia las áreas principales. -->
     <header class="site-header">
@@ -159,7 +159,7 @@
               </div>
             </article>
 
-            <article class="card add-pet-card">
+            <a class="card add-pet-card" href="registro-mascota.html" aria-label="Registrar una mascota">
               <div class="add-pet-content">
                 <span class="add-pet-icon" aria-hidden="true">+</span>
                 <h3 class="add-pet-title">Registrar mascota</h3>
@@ -167,7 +167,7 @@
                   Añade un nuevo compañero a tu perfil para gestionar su salud.
                 </p>
               </div>
-            </article>
+            </a>
           </div>
         </section>
 
@@ -202,5 +202,6 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/perfil.js" defer></script>
+    <script src="../js/mascotas.js" defer></script>
   </body>
 </html>

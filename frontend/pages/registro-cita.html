@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="../css/base.css" />
     <link rel="stylesheet" href="../css/components.css" />
     <link rel="stylesheet" href="../css/responsive.css" />
-  </head>
+  <script src="../js/auth.js"></script></head>
   <body class="booking-page">
     <header class="site-header">
       <nav class="navbar booking-header container-vet" aria-label="Navegación del registro de cita">
@@ -45,7 +45,7 @@
         <!-- Primera etapa: selección de la mascota que recibirá la atención. -->
         <section aria-labelledby="pet-selection-title">
           <h2 id="pet-selection-title" class="section-title booking-section-title">¿Para quién es la cita?</h2>
-          <div class="booking-option-grid">
+          <div class="booking-option-grid" id="petOptions" hidden>
             <label class="booking-option booking-pet-option">
               <input type="radio" name="pet" value="milo" />
               <img class="booking-pet-image" src="../assets/images/mascotas/milo.jpg" alt="Oliver, perro Golden Retriever" />
@@ -57,6 +57,7 @@
               <span><span class="booking-pet-name">Snow</span><span class="booking-pet-details">Gata Persa · 2 años</span></span>
             </label>
           </div>
+          <p class="booking-clinic-message" id="petCatalogMessage" role="status" aria-live="polite">Cargando tus mascotas...</p>
           <div class="booking-actions">
             <a class="btn btn-secondary" href="dashboard.html">Volver</a>
             <a class="btn btn-primary" href="registro-servicio.html">Continuar →</a>

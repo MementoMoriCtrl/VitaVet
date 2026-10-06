@@ -40,11 +40,13 @@ public class CitaController {
 
     @PostMapping
     public ResponseEntity<Cita> crearCita(@RequestBody Cita cita, @AuthenticationPrincipal Jwt jwt) {
-        if (!JwtIdentity.isAdmin(jwt)
-                && !mascotaRepository.existsByIdMascotaAndIdUsuario(
-                        cita.getIdMascota(), JwtIdentity.userId(jwt))) {
-            return ResponseEntity.notFound().build();
+        if (!JwtIdentity.isAdmin(jwt)) {
+            if (!mascotaRepository.existsByIdMascotaAndIdUsuario(
+                    cita.getIdMascota(), JwtIdentity.userId(jwt))) {
+                return ResponseEntity.notFound().build();
+            }
         }
+        cita.setEstado("Programada");
         return ResponseEntity.ok(citaRepository.save(cita));
     }
 
@@ -54,14 +56,22 @@ public class CitaController {
             @RequestBody Cita datosCita,
             @AuthenticationPrincipal Jwt jwt) {
 
-        if (!JwtIdentity.isAdmin(jwt)
-                && !mascotaRepository.existsByIdMascotaAndIdUsuario(
-                        datosCita.getIdMascota(), JwtIdentity.userId(jwt))) {
-            return ResponseEntity.notFound().build();
-        }
-
         return buscarPorIdentidad(id, jwt)
                 .map(cita -> {
+                    if (!JwtIdentity.isAdmin(jwt)) {
+                        if (!mascotaRepository.existsByIdMascotaAndIdUsuario(
+                                datosCita.getIdMascota(), JwtIdentity.userId(jwt))) {
+                            return ResponseEntity.notFound().<Cita>build();
+                        }
+                        if (!"Programada".equals(cita.getEstado())) {
+                            return ResponseEntity.status(409).<Cita>build();
+                        }
+                        if (!"Cancelada".equals(datosCita.getEstado())) {
+                            return ResponseEntity.status(403).<Cita>build();
+                        }
+                        cita.setEstado("Cancelada");
+                        return ResponseEntity.ok(citaRepository.save(cita));
+                    }
                     cita.setIdMascota(datosCita.getIdMascota());
                     cita.setIdVeterinario(datosCita.getIdVeterinario());
                     cita.setIdServicio(datosCita.getIdServicio());
@@ -76,6 +86,9 @@ public class CitaController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarCita(@PathVariable Integer id, @AuthenticationPrincipal Jwt jwt) {
+        if (!JwtIdentity.isAdmin(jwt)) {
+            return ResponseEntity.status(403).build();
+        }
         return buscarPorIdentidad(id, jwt)
                 .map(cita -> {
                     citaRepository.delete(cita);

@@ -23,26 +23,10 @@ const prepareBookingEntry = () => {
   if (!window.location.pathname.endsWith("/registro-cita.html")) return;
   const query = new URLSearchParams(window.location.search);
   if (!query.has("retomar")) {
-    const previousState = readBookingState();
-    const petState = previousState.petId || previousState.pet
-      ? { petId: previousState.petId, pet: previousState.pet }
-      : {};
-    sessionStorage.setItem(bookingStorageKey, JSON.stringify(petState));
+    sessionStorage.setItem(bookingStorageKey, JSON.stringify({}));
     query.set("retomar", "1");
     window.history.replaceState(null, "", `?${query.toString()}`);
   }
-};
-
-const petDetails = {
-  milo: { name: "Oliver", image: "milo.jpg", description: "Perro · Golden Retriever · 4 años" },
-  nala: { name: "Snow", image: "nala.jpg", description: "Gata Persa · 2 años" }
-};
-
-const veterinarianSpecialties = {
-  "Dra. Valeria Torres": "Medicina General",
-  "Dr. Sebastián Rojas": "Medicina Preventiva",
-  "Dra. Andrea Mendoza": "Medicina Veterinaria",
-  "Dr. Carlos Ramírez": "Cirugía Veterinaria"
 };
 
 const calendarMonthNames = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
@@ -56,6 +40,20 @@ const parseBookingDate = (date) => {
   const year = Number(match[3]);
   if (month < 0 || day < 1 || day > new Date(year, month + 1, 0).getDate()) return null;
   return { day, month, year };
+};
+const toApiBookingDate = (date) => {
+  const parsed = parseBookingDate(date);
+  return parsed
+    ? `${parsed.year}-${String(parsed.month + 1).padStart(2, "0")}-${String(parsed.day).padStart(2, "0")}`
+    : undefined;
+};
+const toApiBookingTime = (time) => {
+  const match = /^(\d{1,2}):(\d{2}) (AM|PM)$/i.exec(time || "");
+  if (!match) return undefined;
+  let hour = Number(match[1]);
+  if (match[3].toUpperCase() === "PM" && hour < 12) hour += 12;
+  if (match[3].toUpperCase() === "AM" && hour === 12) hour = 0;
+  return `${String(hour).padStart(2, "0")}:${match[2]}:00`;
 };
 const isValidBookingDate = (date) => {
   const bookingDate = parseBookingDate(date);
@@ -76,11 +74,32 @@ const normalizePaymentMethod = (value) => {
   return undefined;
 };
 
+const isValidBackendId = (value) => Number.isInteger(Number(value)) && Number(value) > 0;
+const bookingApiBase = "http://localhost:8080/api";
+const requestBookingApi = async (token, endpoint, options = {}) => {
+  const headers = { Authorization: `Bearer ${token}`, ...(options.body ? { "Content-Type": "application/json" } : {}) };
+  const response = await fetch(`${bookingApiBase}${endpoint}`, { ...options, headers });
+  const responseText = await response.text();
+  let data = null;
+  if (responseText.trim()) {
+    try { data = JSON.parse(responseText); } catch { data = null; }
+  }
+  if (!response.ok) {
+    const error = new Error(`HTTP ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+  return data;
+};
+
 const getMissingBookingStep = (state) => {
-  const petId = state.petId || Object.keys(petDetails).find((id) => petDetails[id].name === state.pet);
-  if (!petId || !petDetails[petId]) return { label: "la mascota", href: "registro-cita.html?retomar=1" };
-  if (!state.service || !state.price) return { label: "el servicio", href: "registro-servicio.html" };
-  if (!veterinarianSpecialties[state.veterinarian]) return { label: "el veterinario", href: "registro-veterinario.html" };
+  if (!isValidBackendId(state.idMascota) || !state.petName) return { label: "la mascota", href: "registro-cita.html?retomar=1" };
+  if (!isValidBackendId(state.idServicio) || !state.service || !Number.isFinite(Number(state.servicePrice))) {
+    return { label: "el servicio", href: "registro-servicio.html" };
+  }
+  if (!isValidBackendId(state.idVeterinario) || !state.veterinarian || !state.veterinarianSpecialty) {
+    return { label: "el veterinario", href: "registro-veterinario.html" };
+  }
   if (!isValidBookingDate(state.date)) return { label: "la fecha", href: "registro-fecha-hora.html" };
   if (!validBookingTimes.includes(state.time)) return { label: "la hora", href: "registro-fecha-hora.html" };
   const paymentType = normalizePaymentMode(state.paymentType);
@@ -101,16 +120,20 @@ const restoreRadio = (name, value) => {
 // Refleja en cada etapa los datos guardados de la reserva.
 const updateBookingSummaries = (state) => {
   const pending = "Pendiente de selección";
-  const pet = petDetails[state.petId || state.pet];
+  const pet = state.petName ? {
+    name: state.petName,
+    image: state.petImage,
+    description: state.petDescription || "Mascota"
+  } : null;
   document.querySelectorAll(".booking-summary-pet").forEach((summary) => {
     const image = summary.querySelector(".booking-summary-image");
     const name = summary.querySelector(".booking-summary-pet-name");
     const details = summary.querySelector(".booking-summary-pet-details");
-    if (image && pet) {
+    if (image && pet?.image) {
       image.src = `../assets/images/mascotas/${pet.image}`;
       image.alt = `${pet.name}, ${pet.description}`;
     }
-    if (image) image.hidden = !pet;
+    if (image) image.hidden = !pet?.image;
     if (name) name.textContent = pet?.name || pending;
     if (details) details.textContent = pet?.description || pending;
   });
@@ -129,7 +152,7 @@ const updateBookingSummaries = (state) => {
       "Fecha y hora": state.date || state.time
         ? `${state.date || pending}, ${state.time || pending}`
         : pending,
-      Especialidad: veterinarianSpecialties[state.veterinarian],
+      Especialidad: state.veterinarianSpecialty,
       "Modalidad de pago": paymentType === "now"
         ? "Pagar ahora"
         : paymentType === "clinic" ? "Pagar en la clínica" : undefined,
@@ -146,13 +169,11 @@ const updateBookingSummaries = (state) => {
     total.textContent = state.price || pending;
   });
   const paymentButton = document.querySelector('a[href="registro-confirmacion.html"]');
-  if (paymentButton && state.price) {
-    paymentButton.textContent = state.paymentType === "clinic"
-      ? `Confirmar cita ${state.price}`
-      : `Confirmar y pagar ${state.price}`;
-  }
+  if (paymentButton && state.price) paymentButton.textContent = "Registrar cita y pago pendiente";
   const confirmationText = document.querySelector(".booking-confirmation-text");
-  if (confirmationText) confirmationText.textContent = `La cita de ${pet?.name || pending} ha sido registrada correctamente.`;
+  if (confirmationText && state.createdAppointment) {
+    confirmationText.textContent = `La cita de ${pet?.name || pending} fue registrada correctamente.`;
+  }
 };
 
 const syncBookingSelections = () => {
@@ -170,8 +191,9 @@ const syncBookingSelections = () => {
   if (previousMethod && state.paymentMethod !== previousMethod) paymentMigration.paymentMethod = previousMethod;
   if (Object.keys(paymentMigration).length) state = saveBookingState(paymentMigration);
 
-  restoreRadio("pet", state.petId || (petDetails[state.pet] ? state.pet : Object.keys(petDetails).find((id) => petDetails[id].name === state.pet)));
-  restoreRadio("service", state.service);
+  restoreRadio("pet", state.idMascota);
+  restoreRadio("service", state.idServicio);
+  restoreRadio("veterinarian", state.idVeterinario);
   if (state.paymentType) restoreRadio("paymentType", state.paymentType);
 
   const selectedPet = document.querySelector('input[name="pet"]:checked');
@@ -179,19 +201,27 @@ const syncBookingSelections = () => {
   const selectedPaymentType = document.querySelector('input[name="paymentType"]:checked');
   const updates = {};
   if (selectedPet) {
-    updates.petId = selectedPet.value;
-    updates.pet = petDetails[selectedPet.value]?.name || selectedPet.value;
+    updates.idMascota = Number(selectedPet.value);
   }
   if (selectedService) {
-    updates.service = selectedService.value;
-    if (selectedService.dataset.price) updates.price = selectedService.dataset.price;
+    updates.idServicio = Number(selectedService.value);
   }
   if (selectedPaymentType) updates.paymentType = selectedPaymentType.value;
 
   const dateGrid = document.querySelector(".booking-date-grid");
   const timeGrid = document.querySelector(".booking-time-grid");
-  if (dateGrid && !isValidBookingDate(state.date)) updates.date = undefined;
-  if (timeGrid && !validBookingTimes.includes(state.time)) updates.time = undefined;
+  if (dateGrid && !isValidBookingDate(state.date)) {
+    updates.date = undefined;
+    updates.fecha = undefined;
+  } else if (dateGrid && state.fecha !== toApiBookingDate(state.date)) {
+    updates.fecha = toApiBookingDate(state.date);
+  }
+  if (timeGrid && !validBookingTimes.includes(state.time)) {
+    updates.time = undefined;
+    updates.hora = undefined;
+  } else if (timeGrid && state.hora !== toApiBookingTime(state.time)) {
+    updates.hora = toApiBookingTime(state.time);
+  }
   const paymentMethodButtons = document.querySelectorAll(".booking-payment-method");
   if (selectedPaymentType?.value === "clinic") {
     updates.paymentMethod = "";
@@ -263,7 +293,7 @@ const syncBookingSelections = () => {
       button.append(weekdayLabel, dateLabel);
       button.addEventListener("click", () => {
         if (!isValidBookingDate(button.dataset.date)) return;
-        state = saveBookingState({ date: button.dataset.date });
+        state = saveBookingState({ date: button.dataset.date, fecha: toApiBookingDate(button.dataset.date) });
         reflectCalendarSelection(state);
       });
       dateGrid.append(button);
@@ -287,21 +317,18 @@ const syncBookingSelections = () => {
   timeChoices.forEach((button) => {
     button.addEventListener("click", () => {
       if (!validBookingTimes.includes(button.dataset.time)) return;
-      reflectCalendarSelection(saveBookingState({ time: button.dataset.time }));
+      reflectCalendarSelection(saveBookingState({ time: button.dataset.time, hora: toApiBookingTime(button.dataset.time) }));
     });
   });
   if (dateGrid || timeGrid) reflectCalendarSelection(state);
 
-  document.querySelectorAll('input[name="pet"], input[name="service"], input[name="paymentType"]').forEach((input) => {
+  document.querySelectorAll('input[name="paymentType"]').forEach((input) => {
     input.addEventListener("change", () => {
       document.querySelectorAll(`input[name="${input.name}"]`).forEach((option) => {
         option.closest(".booking-option")?.classList.toggle("is-selected", option.checked);
       });
-      const key = input.name === "pet" ? "pet" : input.name === "service" ? "service" : "paymentType";
-      const changed = input.name === "pet"
-        ? { pet: petDetails[input.value]?.name || input.value, petId: input.value }
-        : { [key]: input.value };
-      if (input.name === "service" && input.dataset.price) changed.price = input.dataset.price;
+      const changed = { paymentType: input.value };
+      if (input.value === "clinic") changed.paymentMethod = "";
       updateBookingSummaries(saveBookingState(changed));
     });
   });
@@ -407,17 +434,602 @@ const syncBookingSelections = () => {
     }
   });
 
+  let creatingAppointment = false;
+  confirmBookingButton?.addEventListener("click", async (event) => {
+    if (event.defaultPrevented) return;
+    event.preventDefault();
+    if (creatingAppointment) return;
+
+    const createMessage = document.querySelector("#bookingCreateMessage");
+    const currentBooking = readBookingState();
+    const missingStep = getMissingBookingStep(currentBooking);
+    if (missingStep) {
+      setBookingMessage(createMessage, `Completa primero ${missingStep.label}.`);
+      return;
+    }
+    const token = sessionStorage.getItem("vitaVetToken");
+    if (!token) {
+      setBookingMessage(createMessage, "Tu sesión no es válida.", true);
+      return;
+    }
+
+    const fecha = toApiBookingDate(currentBooking.date);
+    const hora = toApiBookingTime(currentBooking.time);
+    if (!fecha || !hora) {
+      setBookingMessage(createMessage, "La fecha o la hora seleccionada no es válida.");
+      return;
+    }
+
+    creatingAppointment = true;
+    confirmBookingButton.setAttribute("aria-disabled", "true");
+    confirmBookingButton.textContent = "Registrando cita y pago...";
+    setBookingMessage(createMessage, "Registrando la cita y el pago pendiente...");
+    let appointment = null;
+    try {
+      const services = await requestBookingApi(token, "/servicios");
+      const service = Array.isArray(services)
+        ? services.find((item) => Number(item.idServicio) === Number(currentBooking.idServicio))
+        : null;
+      const servicePrice = Number(service?.precio);
+      if (!service || !Number.isFinite(servicePrice) || servicePrice < 0) {
+        setBookingMessage(createMessage, "No se pudo verificar el precio actual del servicio. Inténtalo nuevamente.");
+        return;
+      }
+
+      const savedBooking = readBookingState();
+      const previousId = Number(savedBooking.createdAppointment?.idCita);
+      if (Number.isInteger(previousId) && previousId > 0) {
+        // Tras una recarga, valida con la API la cita devuelta por el POST anterior.
+        appointment = await requestBookingApi(token, `/citas/${encodeURIComponent(previousId)}`);
+      } else {
+        appointment = await requestBookingApi(token, "/citas", {
+          method: "POST",
+          body: JSON.stringify({
+            idMascota: Number(currentBooking.idMascota),
+            idServicio: Number(currentBooking.idServicio),
+            idVeterinario: Number(currentBooking.idVeterinario),
+            fecha,
+            hora
+          })
+        });
+      }
+      if (!appointment || !isValidBackendId(appointment.idCita)) {
+        throw new Error("El servidor no devolvió una cita válida.");
+      }
+      if (Number(appointment.idMascota) !== Number(currentBooking.idMascota)
+        || Number(appointment.idServicio) !== Number(currentBooking.idServicio)
+        || Number(appointment.idVeterinario) !== Number(currentBooking.idVeterinario)) {
+        throw new Error("La cita recuperada no coincide con las selecciones actuales.");
+      }
+
+      const bookingWithAppointment = saveBookingState({
+        createdAppointment: appointment,
+        idCita: Number(appointment.idCita),
+        servicePrice,
+        price: `S/ ${servicePrice.toFixed(2)}`,
+        paymentError: undefined
+      });
+      const findExistingPayment = async () => {
+        const payments = await requestBookingApi(token, "/pagos");
+        if (!Array.isArray(payments)) throw new Error("Respuesta de pagos no válida.");
+        return payments.find((payment) => Number(payment.idCita) === Number(appointment.idCita)) || null;
+      };
+
+      // También se consulta al reanudar tras recarga para no crear pagos duplicados.
+      let payment = await findExistingPayment();
+      if (!payment) {
+        const paymentType = normalizePaymentMode(bookingWithAppointment.paymentType);
+        const paymentMethod = normalizePaymentMethod(bookingWithAppointment.paymentMethod);
+        const paymentPayload = {
+          idCita: Number(appointment.idCita),
+          modalidad: paymentType === "clinic" ? "presencial" : "online",
+          metodo: paymentType === "clinic" ? "efectivo" : paymentMethod === "yape" ? "yape" : "tarjeta",
+          monto: servicePrice,
+          estado: "Pendiente"
+        };
+        try {
+          payment = await requestBookingApi(token, "/pagos", {
+            method: "POST",
+            body: JSON.stringify(paymentPayload)
+          });
+        } catch (paymentError) {
+          // Una respuesta perdida puede ocultar un guardado exitoso; reconcilia antes de reintentar.
+          if ([400, 401, 403, 404, 409].includes(paymentError.status)) throw paymentError;
+          try { payment = await findExistingPayment(); } catch { /* Mantiene el error original. */ }
+          if (!payment) throw paymentError;
+        }
+        if (!payment || !isValidBackendId(payment.idPago)
+          || Number(payment.idCita) !== Number(appointment.idCita)) {
+          payment = await findExistingPayment();
+        }
+      }
+      if (!payment || !isValidBackendId(payment.idPago)
+        || Number(payment.idCita) !== Number(appointment.idCita)) {
+        throw new Error("El servidor no confirmó el registro del pago.");
+      }
+      saveBookingState({ createdAppointment: appointment, createdPayment: payment, paymentError: undefined });
+      window.location.href = "registro-confirmacion.html";
+    } catch (error) {
+      const errors = {
+        400: "Los datos enviados no son válidos.",
+        401: "Tu sesión ya no es válida.",
+        403: "No tienes permisos para realizar esta operación.",
+        404: "No se encontró la cita o alguno de los datos seleccionados.",
+        409: "La solicitud entra en conflicto con el estado actual del registro.",
+        500: "Ocurrió un error en el servidor. Inténtalo más tarde."
+      };
+      const errorMessage = errors[error.status]
+        || (error instanceof TypeError ? "No se pudo conectar con el servidor. Inténtalo nuevamente." : error.message);
+      if (appointment && isValidBackendId(appointment.idCita)) {
+        saveBookingState({
+          createdAppointment: appointment,
+          idCita: Number(appointment.idCita),
+          createdPayment: null,
+          paymentError: errorMessage
+        });
+        setBookingMessage(createMessage,
+          `La cita #${appointment.idCita} fue creada, pero no se pudo confirmar el registro del pago. ${errorMessage} Puedes volver a intentarlo; se verificará primero si el pago ya existe.`,
+          error.status === 401);
+      } else {
+        setBookingMessage(createMessage, errorMessage, error.status === 401);
+      }
+    } finally {
+      creatingAppointment = false;
+      confirmBookingButton.removeAttribute("aria-disabled");
+      confirmBookingButton.textContent = "Registrar cita y pago pendiente";
+    }
+  });
   if (paymentMethodButtons.length || onlinePaymentSection) syncPaymentInterface(state);
 
   updateBookingSummaries(state);
 };
 
-syncBookingSelections();
-
-if (window.location.pathname.endsWith("/registro-confirmacion.html")) {
-  const missingStep = getMissingBookingStep(readBookingState());
-  if (missingStep) {
-    window.alert(`Para confirmar la cita, completa ${missingStep.label}. Te llevaremos a ese paso.`);
-    window.location.replace(missingStep.href);
+const setBookingMessage = (element, text, loginLink = false) => {
+  if (!element) return;
+  element.replaceChildren(document.createTextNode(text));
+  if (loginLink) {
+    element.append(" ");
+    const link = document.createElement("a");
+    link.href = "login.html";
+    link.textContent = "Iniciar sesión";
+    element.append(link);
   }
+  element.hidden = false;
+};
+
+const petPresentation = (pet) => {
+  const type = String(pet.tipo || "");
+  const isCat = type.toLocaleLowerCase("es").includes("gato");
+  const image = isCat ? "nala.jpg" : "milo.jpg";
+  const description = [type, pet.raza, Number.isFinite(Number(pet.edad)) ? `${pet.edad} años` : ""]
+    .filter(Boolean).join(" · ");
+  return { image, description };
+};
+
+const attachRealSelection = (input, payload) => {
+  input.addEventListener("change", () => {
+    document.querySelectorAll(`input[name="${input.name}"]`).forEach((option) => {
+      option.closest(".booking-option")?.classList.toggle("is-selected", option.checked);
+    });
+    updateBookingSummaries(saveBookingState({ ...payload, createdAppointment: null, createdPayment: null, idCita: undefined }));
+  });
+};
+
+const renderPetOptions = (pets) => {
+  const grid = document.querySelector("#petOptions");
+  if (!grid) return;
+  const previous = readBookingState();
+  grid.replaceChildren();
+  pets.forEach((pet) => {
+    const id = Number(pet.idMascota);
+    if (!Number.isInteger(id) || id <= 0 || typeof pet.nombre !== "string") return;
+    const presentation = petPresentation(pet);
+    const label = document.createElement("label");
+    label.className = "booking-option booking-pet-option";
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = "pet";
+    input.value = String(id);
+    const image = document.createElement("img");
+    image.className = "booking-pet-image";
+    image.src = `../assets/images/mascotas/${presentation.image}`;
+    image.alt = `${pet.nombre}, ${presentation.description}`;
+    const info = document.createElement("span");
+    const name = document.createElement("span");
+    name.className = "booking-pet-name";
+    name.textContent = pet.nombre;
+    const description = document.createElement("span");
+    description.className = "booking-pet-details";
+    description.textContent = presentation.description;
+    info.append(name, description);
+    label.append(input, image, info);
+    grid.append(label);
+    attachRealSelection(input, {
+      idMascota: id,
+      petId: id,
+      pet: pet.nombre,
+      petName: pet.nombre,
+      petType: pet.tipo || "",
+      petBreed: pet.raza || "",
+      petSex: pet.sexo || "",
+      petAge: pet.edad,
+      petImage: presentation.image,
+      petDescription: presentation.description,
+      createdAppointment: null,
+      createdPayment: null,
+      idCita: undefined
+    });
+  });
+  const selected = grid.querySelector(`input[name="pet"][value="${previous.idMascota}"]`);
+  if (selected) {
+    selected.checked = true;
+    selected.closest(".booking-option")?.classList.add("is-selected");
+    selected.dispatchEvent(new Event("change", { bubbles: true }));
+  } else if (previous.idMascota) {
+    saveBookingState({ idMascota: undefined, petId: undefined, pet: undefined, petName: undefined,
+      petType: undefined, petBreed: undefined, petSex: undefined, petAge: undefined,
+      petImage: undefined, petDescription: undefined, createdAppointment: null, createdPayment: null, idCita: undefined });
+  }
+  grid.hidden = grid.children.length === 0;
+  updateBookingSummaries(readBookingState());
+};
+
+const renderServiceOptions = (services) => {
+  const grid = document.querySelector("#serviceOptions");
+  if (!grid) return;
+  const previous = readBookingState();
+  grid.replaceChildren();
+  services.forEach((service) => {
+    const id = Number(service.idServicio);
+    const price = Number(service.precio);
+    if (!Number.isInteger(id) || id <= 0 || typeof service.nombre !== "string" || !Number.isFinite(price)) return;
+    const label = document.createElement("label");
+    label.className = "booking-option";
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = "service";
+    input.value = String(id);
+    const header = document.createElement("span");
+    header.className = "booking-option-header";
+    const title = document.createElement("span");
+    title.className = "booking-option-title";
+    title.textContent = service.nombre;
+    const priceLabel = document.createElement("span");
+    priceLabel.className = "booking-option-price";
+    priceLabel.textContent = `S/ ${price.toFixed(2)}`;
+    header.append(title, priceLabel);
+    const description = document.createElement("span");
+    description.className = "booking-option-description";
+    const duration = Number(service.duracionMinutos);
+    description.textContent = [service.descripcion, Number.isFinite(duration) && duration > 0
+      ? `${duration} min` : ""].filter(Boolean).join(" · ");
+    label.append(input, header, description);
+    grid.append(label);
+    attachRealSelection(input, {
+      idServicio: id,
+      service: service.nombre,
+      serviceDescription: service.descripcion || "",
+      servicePrice: price,
+      serviceDuration: service.duracionMinutos,
+      price: `S/ ${price.toFixed(2)}`,
+      createdAppointment: null,
+      createdPayment: null,
+      idCita: undefined
+    });
+  });
+  const selected = grid.querySelector(`input[name="service"][value="${previous.idServicio}"]`);
+  if (selected) {
+    selected.checked = true;
+    selected.closest(".booking-option")?.classList.add("is-selected");
+    selected.dispatchEvent(new Event("change", { bubbles: true }));
+  } else if (previous.idServicio) {
+    saveBookingState({ idServicio: undefined, service: undefined, serviceDescription: undefined,
+      servicePrice: undefined, serviceDuration: undefined, price: undefined, createdAppointment: null, createdPayment: null, idCita: undefined });
+  }
+  grid.hidden = grid.children.length === 0;
+  updateBookingSummaries(readBookingState());
+};
+
+const renderVeterinarianOptions = (veterinarians) => {
+  const grid = document.querySelector("#veterinarianOptions");
+  if (!grid) return;
+  const previous = readBookingState();
+  grid.replaceChildren();
+  veterinarians.forEach((veterinarian) => {
+    const id = Number(veterinarian.idVeterinario);
+    if (!Number.isInteger(id) || id <= 0 || typeof veterinarian.nombre !== "string"
+      || typeof veterinarian.apellido !== "string") return;
+    const fullName = `${veterinarian.nombre} ${veterinarian.apellido}`.trim();
+    const label = document.createElement("label");
+    label.className = "booking-option booking-veterinarian-option";
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = "veterinarian";
+    input.value = String(id);
+    const selection = document.createElement("span");
+    selection.className = "booking-veterinarian-selection";
+    selection.setAttribute("aria-hidden", "true");
+    selection.textContent = "✓";
+    const photo = document.createElement("span");
+    photo.className = "booking-veterinarian-photo";
+    photo.setAttribute("aria-hidden", "true");
+    photo.textContent = `${veterinarian.nombre[0] || ""}${veterinarian.apellido[0] || ""}`;
+    const info = document.createElement("span");
+    info.className = "booking-veterinarian-info";
+    const name = document.createElement("span");
+    name.className = "booking-option-title";
+    name.textContent = fullName;
+    const specialty = document.createElement("span");
+    specialty.className = "booking-option-description";
+    specialty.textContent = veterinarian.especialidad || "";
+    info.append(name, specialty);
+    label.append(input, selection, photo, info);
+    grid.append(label);
+    attachRealSelection(input, {
+      idVeterinario: id,
+      veterinarian: fullName,
+      veterinarianSpecialty: veterinarian.especialidad || "",
+      createdAppointment: null,
+      createdPayment: null,
+      idCita: undefined
+    });
+  });
+  const selected = grid.querySelector(`input[name="veterinarian"][value="${previous.idVeterinario}"]`);
+  if (selected) {
+    selected.checked = true;
+    selected.closest(".booking-option")?.classList.add("is-selected");
+    selected.dispatchEvent(new Event("change", { bubbles: true }));
+  } else if (previous.idVeterinario) {
+    saveBookingState({ idVeterinario: undefined, veterinarian: undefined,
+      veterinarianSpecialty: undefined, createdAppointment: null, createdPayment: null, idCita: undefined });
+  }
+  grid.hidden = grid.children.length === 0;
+  updateBookingSummaries(readBookingState());
+};
+
+const loadBookingCatalog = async (endpoint, gridSelector, messageSelector, render, emptyMessage, allowPetRegistration = false) => {
+  const grid = document.querySelector(gridSelector);
+  const message = document.querySelector(messageSelector);
+  if (!grid || !message) return;
+  const token = sessionStorage.getItem("vitaVetToken");
+  if (!token) {
+    setBookingMessage(message, "Tu sesión no es válida.", true);
+    return;
+  }
+  try {
+    const response = await fetch(`http://localhost:8080/api/${endpoint}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!response.ok) {
+      const errors = {
+        401: "Tu sesión ya no es válida.",
+        403: "No tienes permisos para consultar estos datos.",
+        404: "No se encontraron los datos solicitados.",
+        500: "Ocurrió un error en el servidor. Inténtalo más tarde."
+      };
+      setBookingMessage(message, errors[response.status] || "No se pudieron cargar los datos.", response.status === 401);
+      return;
+    }
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+      setBookingMessage(message, "El servidor devolvió una respuesta no válida.");
+      return;
+    }
+    if (!data.length) {
+      grid.replaceChildren();
+      grid.hidden = true;
+      if (allowPetRegistration) {
+        message.replaceChildren(document.createTextNode(emptyMessage + " "));
+        const link = document.createElement("a");
+        link.href = "registro-mascota.html";
+        link.textContent = "Registrar mascota";
+        message.append(link);
+        message.hidden = false;
+      } else {
+        setBookingMessage(message, emptyMessage);
+      }
+      return;
+    }
+    message.hidden = true;
+    render(data);
+    if (!grid.children.length) {
+      grid.hidden = true;
+      if (allowPetRegistration) {
+        message.replaceChildren(document.createTextNode(emptyMessage + " "));
+        const link = document.createElement("a");
+        link.href = "registro-mascota.html";
+        link.textContent = "Registrar mascota";
+        message.append(link);
+        message.hidden = false;
+      } else {
+        setBookingMessage(message, emptyMessage);
+      }
+      return;
+    }
+    message.hidden = false;
+    message.textContent = "Selecciona una opción para continuar.";
+  } catch {
+    setBookingMessage(message, "No se pudo conectar con el servidor. Inténtalo nuevamente.");
+  }
+};
+
+const bindBookingContinue = () => {
+  const path = window.location.pathname;
+  const rules = [
+    ["/registro-cita.html", 'a[href="registro-servicio.html"]', (state) => isValidBackendId(state.idMascota)],
+    ["/registro-servicio.html", 'a[href="registro-veterinario.html"]', (state) => isValidBackendId(state.idServicio)],
+    ["/registro-veterinario.html", "#continueVeterinarian", (state) => isValidBackendId(state.idVeterinario)],
+    ["/registro-fecha-hora.html", 'a[href="registro-pago.html"]', (state) => isValidBookingDate(state.date) && validBookingTimes.includes(state.time)]
+  ];
+  const rule = rules.find(([page]) => path.endsWith(page));
+  if (!rule) return;
+  const [page, selector, isValid] = rule;
+  const button = document.querySelector(selector);
+  const messageSelector = page.includes("registro-cita") ? "#petCatalogMessage"
+    : page.includes("registro-servicio") ? "#serviceCatalogMessage"
+      : page.includes("registro-veterinario") ? "#veterinarianCatalogMessage" : null;
+  button?.addEventListener("click", (event) => {
+    if (isValid(readBookingState())) return;
+    event.preventDefault();
+    const message = messageSelector ? document.querySelector(messageSelector) : null;
+    setBookingMessage(message, "Completa la selección antes de continuar.");
+  });
+};
+
+const formatApiDate = (value, fallback) => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || "");
+  if (!match) return fallback;
+  return `${Number(match[3])} ${calendarMonthNames[Number(match[2]) - 1]} ${match[1]}`;
+};
+
+const formatApiTime = (value, fallback) => {
+  const match = /^(\d{2}):(\d{2})/.exec(value || "");
+  if (!match) return fallback;
+  const hour24 = Number(match[1]);
+  const suffix = hour24 >= 12 ? "PM" : "AM";
+  const hour12 = hour24 % 12 || 12;
+  return `${String(hour12).padStart(2, "0")}:${match[2]} ${suffix}`;
+};
+
+const renderCreatedConfirmation = async () => {
+  if (!window.location.pathname.endsWith("/registro-confirmacion.html")) return;
+  const state = readBookingState();
+  const section = document.querySelector(".booking-confirmation");
+  const message = document.querySelector("#bookingConfirmationMessage");
+  if (!section || !message) return;
+
+  const showFailure = (text, href, linkText) => {
+    section.hidden = true;
+    message.replaceChildren(document.createTextNode(`${text} `));
+    const link = document.createElement("a");
+    link.href = href;
+    link.textContent = linkText;
+    message.append(link);
+    message.hidden = false;
+  };
+  const appointmentId = Number(state.createdAppointment?.idCita);
+  const paymentId = Number(state.createdPayment?.idPago);
+  if (!Number.isInteger(appointmentId) || appointmentId <= 0) {
+    showFailure("No hay una cita registrada para confirmar.", "registro-cita.html", "Iniciar un registro de cita");
+    return;
+  }
+  if (!Number.isInteger(paymentId) || paymentId <= 0) {
+    showFailure(`La cita #${appointmentId} fue creada, pero el pago no está confirmado.`, "registro-pago.html", "Volver al registro del pago");
+    return;
+  }
+
+  try {
+    const token = sessionStorage.getItem("vitaVetToken");
+    if (!token) {
+      const error = new Error("Sesión inválida");
+      error.status = 401;
+      throw error;
+    }
+    const [appointment, payment, pets, services, veterinarians] = await Promise.all([
+      requestBookingApi(token, `/citas/${encodeURIComponent(appointmentId)}`),
+      requestBookingApi(token, `/pagos/${encodeURIComponent(paymentId)}`),
+      requestBookingApi(token, "/mascotas"),
+      requestBookingApi(token, "/servicios"),
+      requestBookingApi(token, "/veterinarios")
+    ]);
+    if (!appointment || Number(appointment.idCita) !== appointmentId
+      || !payment || Number(payment.idPago) !== paymentId
+      || Number(payment.idCita) !== appointmentId) {
+      throw new Error("La cita y el pago no coinciden.");
+    }
+    if (!Array.isArray(pets) || !Array.isArray(services) || !Array.isArray(veterinarians)) {
+      throw new Error("No se pudieron verificar los catálogos de la cita.");
+    }
+
+    saveBookingState({ createdAppointment: appointment, createdPayment: payment });
+    const pet = pets.find((item) => Number(item.idMascota) === Number(appointment.idMascota));
+    const service = services.find((item) => Number(item.idServicio) === Number(appointment.idServicio));
+    const veterinarian = veterinarians.find((item) => Number(item.idVeterinario) === Number(appointment.idVeterinario));
+    const petName = pet?.nombre || "No disponible";
+    const petDetails = pet
+      ? [pet.tipo, pet.raza, pet.edad !== undefined && pet.edad !== null ? `${pet.edad} años` : ""].filter(Boolean).join(" · ") || "Mascota"
+      : "No disponible";
+    const date = formatApiDate(appointment.fecha, "No disponible");
+    const time = formatApiTime(appointment.hora, "No disponible");
+    const amount = Number(payment.monto);
+    const amountLabel = Number.isFinite(amount) ? `S/ ${amount.toFixed(2)}` : "No disponible";
+    const vetName = veterinarian
+      ? [veterinarian.nombre, veterinarian.apellido].filter(Boolean).join(" ") || "No disponible"
+      : "No disponible";
+    const modalityLabels = { online: "Pagar ahora", presencial: "Pagar en la clínica" };
+    const methodLabels = { tarjeta: "Tarjeta", yape: "Yape / Plin", efectivo: "Efectivo" };
+    const modality = modalityLabels[String(payment.modalidad || "").toLocaleLowerCase("es")] || "No disponible";
+    const method = methodLabels[String(payment.metodo || "").toLocaleLowerCase("es")] || "No disponible";
+
+    const title = document.querySelector("#confirmation-title");
+    if (title) title.textContent = "Cita registrada";
+    const confirmationText = section.querySelector(".booking-confirmation-text");
+    if (confirmationText) {
+      confirmationText.textContent = `La cita #${appointment.idCita} de ${petName} fue registrada. El pago #${payment.idPago} figura como ${payment.estado || "No disponible"}. No se procesó ningún cobro real.`;
+    }
+    const petImage = section.querySelector(".booking-summary-image");
+    if (petImage) {
+      petImage.hidden = !pet;
+      if (pet) {
+        const name = String(pet.nombre || "").toLocaleLowerCase("es");
+        petImage.src = `../assets/images/mascotas/${name === "snow" ? "nala.jpg" : "milo.jpg"}`;
+        petImage.alt = `${petName}, ${petDetails}`;
+      }
+    }
+    const nameElement = section.querySelector(".booking-summary-pet-name");
+    if (nameElement) nameElement.textContent = petName;
+    const detailsElement = section.querySelector(".booking-summary-pet-details");
+    if (detailsElement) detailsElement.textContent = petDetails;
+    const appointmentStatus = section.querySelector(".booking-summary-pet .confirmed");
+    if (appointmentStatus) appointmentStatus.textContent = appointment.estado || "No disponible";
+
+    const normalizeLabel = (text) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("es").trim();
+    const values = {
+      "id de cita": String(appointment.idCita),
+      servicio: service?.nombre || "No disponible",
+      veterinario: vetName,
+      especialidad: veterinarian?.especialidad || "No disponible",
+      "fecha y hora": `${date}, ${time}`,
+      "monto registrado": amountLabel,
+      "modalidad de pago": modality,
+      "metodo de pago": method,
+      "id de pago": String(payment.idPago),
+      "estado del pago": payment.estado || "No disponible"
+    };
+    section.querySelectorAll(".booking-summary-row").forEach((row) => {
+      const label = normalizeLabel(row.querySelector(".booking-summary-label")?.textContent || "");
+      const value = row.querySelector(".booking-summary-value");
+      row.hidden = false;
+      row.style.display = "";
+      if (value && Object.prototype.hasOwnProperty.call(values, label)) value.textContent = values[label];
+    });
+
+    message.hidden = true;
+    section.hidden = false;
+  } catch (error) {
+    const messages = {
+      400: "La respuesta de confirmación no es válida.",
+      401: "Tu sesión no es válida. Inicia sesión nuevamente.",
+      403: "No tienes permiso para consultar esta cita o pago.",
+      404: "No se encontró la cita o el pago registrado.",
+      409: "La cita y el pago no coinciden.",
+      500: "Ocurrió un error en el servidor al cargar la confirmación."
+    };
+    showFailure(messages[error.status] || "No se pudo verificar la confirmación con el servidor.", "citas.html", "Ver mis citas");
+  }
+};
+syncBookingSelections();
+bindBookingContinue();
+
+if (window.location.pathname.endsWith("/registro-cita.html")) {
+  loadBookingCatalog("mascotas", "#petOptions", "#petCatalogMessage", renderPetOptions,
+    "No tienes mascotas registradas.", true);
+} else if (window.location.pathname.endsWith("/registro-servicio.html")) {
+  loadBookingCatalog("servicios", "#serviceOptions", "#serviceCatalogMessage", renderServiceOptions,
+    "No hay servicios disponibles.");
+} else if (window.location.pathname.endsWith("/registro-veterinario.html")) {
+  loadBookingCatalog("veterinarios", "#veterinarianOptions", "#veterinarianCatalogMessage", renderVeterinarianOptions,
+    "No hay veterinarios disponibles.");
 }
+
+renderCreatedConfirmation();

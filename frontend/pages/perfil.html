@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="../css/base.css" />
     <link rel="stylesheet" href="../css/components.css" />
     <link rel="stylesheet" href="../css/responsive.css" />
-  </head>
+  <script src="../js/auth.js"></script></head>
   <body class="dashboard-page">
     <!-- Encabezado autenticado con navegación y menú desplegable de Bootstrap. -->
     <header class="site-header">
@@ -72,50 +72,75 @@
           <section class="card profile-card" aria-labelledby="personal-data-title">
             <div class="card-body">
               <h2 id="personal-data-title" class="profile-card-title">Datos personales</h2>
-              <div class="profile-data-grid">
+              <div class="profile-data-grid" id="profileReadData">
                 <div class="profile-data-item">
                   <span class="profile-data-label">Nombre completo</span>
-                  <span class="profile-data-value">Sofía Perez</span>
+                  <span class="profile-data-value" id="profileFullName">No disponible</span>
                 </div>
                 <div class="profile-data-item">
                   <span class="profile-data-label">Correo electrónico</span>
-                  <span class="profile-data-value">sofia.perez@gmail.com</span>
+                  <span class="profile-data-value" id="profileEmail">No disponible</span>
                 </div>
                 <div class="profile-data-item">
                   <span class="profile-data-label">Teléfono</span>
-                  <span class="profile-data-value">987 654 321</span>
+                  <span class="profile-data-value" id="profilePhone">No disponible</span>
                 </div>
                 <div class="profile-data-item">
                   <span class="profile-data-label">DNI</span>
-                  <span class="profile-data-value">12345678</span>
+                  <span class="profile-data-value" id="profileDni">No disponible</span>
                 </div>
                 <div class="profile-data-item">
                   <span class="profile-data-label">Dirección</span>
-                  <span class="profile-data-value">Av. Los Olivos 123, Lima</span>
+                  <span class="profile-data-value" id="profileAddress">No disponible</span>
                 </div>
               </div>
+
+              <form class="profile-data-grid" id="profileEditForm" novalidate hidden>
+                <div class="profile-data-item form-group">
+                  <label class="form-label" for="profileEditName">Nombre</label>
+                  <input class="form-control" id="profileEditName" name="nombre" type="text" maxlength="50" autocomplete="given-name" required aria-describedby="profileEditNameError" />
+                  <span class="payment-field-error" id="profileEditNameError" role="alert" hidden></span>
+                </div>
+                <div class="profile-data-item form-group">
+                  <label class="form-label" for="profileEditSurname">Apellido</label>
+                  <input class="form-control" id="profileEditSurname" name="apellido" type="text" maxlength="50" autocomplete="family-name" required aria-describedby="profileEditSurnameError" />
+                  <span class="payment-field-error" id="profileEditSurnameError" role="alert" hidden></span>
+                </div>
+                <div class="profile-data-item form-group">
+                  <label class="form-label" for="profileEditEmail">Correo electrónico</label>
+                  <input class="form-control" id="profileEditEmail" name="correo" type="email" maxlength="100" autocomplete="email" required aria-describedby="profileEditEmailError" />
+                  <span class="payment-field-error" id="profileEditEmailError" role="alert" hidden></span>
+                </div>
+                <div class="profile-data-item form-group">
+                  <label class="form-label" for="profileEditPhone">Teléfono</label>
+                  <input class="form-control" id="profileEditPhone" name="telefono" type="tel" maxlength="20" autocomplete="tel" required aria-describedby="profileEditPhoneError" />
+                  <span class="payment-field-error" id="profileEditPhoneError" role="alert" hidden></span>
+                </div>
+              </form>
+              <p class="booking-clinic-message" id="profileEditMessage" role="status" aria-live="polite" hidden></p>
 
               <div class="profile-account-section">
                 <h3 class="profile-section-title">Información de la cuenta</h3>
                 <div class="profile-data-grid">
                   <div class="profile-data-item">
                     <span class="profile-data-label">Usuario</span>
-                    <span class="profile-data-value">Sofía Perez</span>
+                    <span class="profile-data-value" id="profileUsername">No disponible</span>
                   </div>
                   <div class="profile-data-item">
                     <span class="profile-data-label">Estado de la cuenta</span>
-                    <span class="profile-data-value profile-account-status">Activa</span>
+                    <span class="profile-data-value profile-account-status" id="profileStatus">No disponible</span>
                   </div>
                   <div class="profile-data-item">
                     <span class="profile-data-label">Cliente desde</span>
-                    <span class="profile-data-value">2026</span>
+                    <span class="profile-data-value" id="profileSince">No disponible</span>
                   </div>
                 </div>
               </div>
 
               <div class="profile-actions">
-                <button class="btn btn-secondary" type="button">Cancelar</button>
-                <button class="btn btn-primary" type="button">Editar perfil</button>
+                <button class="btn btn-secondary" id="cancelProfileEdit" type="button" hidden>Cancelar</button>
+                <button class="btn btn-primary" id="saveProfileChanges" type="submit" form="profileEditForm" hidden>Guardar cambios</button>
+                <button class="btn btn-primary" id="startProfileEdit" type="button">Editar perfil</button>
               </div>
             </div>
           </section>

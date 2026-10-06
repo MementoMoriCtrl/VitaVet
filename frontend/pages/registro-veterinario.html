@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="../css/base.css" />
     <link rel="stylesheet" href="../css/components.css" />
     <link rel="stylesheet" href="../css/responsive.css" />
-  </head>
+  <script src="../js/auth.js"></script></head>
   <body class="booking-page">
     <header class="site-header">
       <nav class="navbar booking-header container-vet" aria-label="Navegación del registro de cita">
@@ -49,33 +49,7 @@
           <!-- Selección del profesional que atenderá la mascota. -->
           <section aria-labelledby="veterinarian-title">
             <h2 id="veterinarian-title" class="section-title booking-section-title">Elige el veterinario que atenderá a tu mascota</h2>
-            <div class="booking-veterinarian-grid">
-              <label class="booking-option booking-veterinarian-option">
-                <input type="radio" name="veterinarian" value="Dra. Valeria Torres" />
-                <span class="booking-veterinarian-selection" aria-hidden="true">✓</span>
-                <span class="booking-veterinarian-photo booking-veterinarian-photo-valeria" aria-hidden="true">VT</span>
-                <span class="booking-veterinarian-info"><span class="booking-option-title">Dra. Valeria Torres</span><span class="booking-option-description">Medicina General</span><span class="booking-veterinarian-rating">★ 4.9 · 120 reseñas</span><span class="booking-veterinarian-availability">● Disponible</span></span>
-              </label>
-              <label class="booking-option booking-veterinarian-option">
-                <input type="radio" name="veterinarian" value="Dr. Sebastián Rojas" />
-                <span class="booking-veterinarian-selection" aria-hidden="true">✓</span>
-                <span class="booking-veterinarian-photo booking-veterinarian-photo-sebastian" aria-hidden="true">SR</span>
-                <span class="booking-veterinarian-info"><span class="booking-option-title">Dr. Sebastián Rojas</span><span class="booking-option-description">Medicina Preventiva</span><span class="booking-veterinarian-rating">★ 4.8 · 95 reseñas</span><span class="booking-veterinarian-availability">● Disponible</span></span>
-              </label>
-              <label class="booking-option booking-veterinarian-option">
-                <input type="radio" name="veterinarian" value="Dra. Andrea Mendoza" />
-                <span class="booking-veterinarian-selection" aria-hidden="true">✓</span>
-                <span class="booking-veterinarian-photo booking-veterinarian-photo-andrea" aria-hidden="true">AM</span>
-                <span class="booking-veterinarian-info"><span class="booking-option-title">Dra. Andrea Mendoza</span><span class="booking-option-description">Medicina Veterinaria</span><span class="booking-veterinarian-rating">★ 4.9 · 108 reseñas</span><span class="booking-veterinarian-availability">● Disponible</span></span>
-              </label>
-              <label class="booking-option booking-veterinarian-option">
-                <input type="radio" name="veterinarian" value="Dr. Carlos Ramírez" />
-                <span class="booking-veterinarian-selection" aria-hidden="true">✓</span>
-                <span class="booking-veterinarian-photo booking-veterinarian-photo-carlos" aria-hidden="true">CR</span>
-                <span class="booking-veterinarian-info"><span class="booking-option-title">Dr. Carlos Ramírez</span><span class="booking-option-description">Cirugía Veterinaria</span><span class="booking-veterinarian-rating">★ 4.7 · 86 reseñas</span><span class="booking-veterinarian-availability">● Disponible</span></span>
-              </label>
-            </div>
-            <div class="booking-actions"><a class="btn btn-secondary" href="registro-servicio.html">← Atrás</a><a id="continueVeterinarian" class="btn btn-primary" href="registro-fecha-hora.html">Continuar →</a></div>
+            <div class="booking-veterinarian-grid" id="veterinarianOptions" hidden></div><p class="booking-clinic-message" id="veterinarianCatalogMessage" role="status" aria-live="polite">Cargando veterinarios...</p><div class="booking-actions"><a class="btn btn-secondary" href="registro-servicio.html">← Atrás</a><a id="continueVeterinarian" class="btn btn-primary" href="registro-fecha-hora.html">Continuar →</a></div>
           </section>
 
           <!-- Resumen de las decisiones tomadas en el flujo hasta ahora. -->
@@ -91,6 +65,5 @@
 
     <footer class="site-footer dashboard-footer"><div class="footer-content container-vet"><span class="footer-brand">VitaVet</span><nav class="footer-links" aria-label="Enlaces legales y de soporte"><a class="footer-link" href="#privacy">Privacidad</a><a class="footer-link" href="#terms">Términos</a><a class="footer-link" href="#support">Soporte</a></nav></div><p class="footer-copyright">© 2026 VitaVet Clínica Veterinaria &amp; Bienestar Animal. Todos los derechos reservados.</p></footer>
     <script src="../js/booking-state.js" defer></script>
-    <script src="../js/registro-veterinario.js" defer></script>
   </body>
 </html>

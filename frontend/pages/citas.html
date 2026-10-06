@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="../css/base.css" />
     <link rel="stylesheet" href="../css/components.css" />
     <link rel="stylesheet" href="../css/responsive.css" />
-  </head>
+  <script src="../js/auth.js"></script></head>
   <body class="dashboard-page">
     <!-- Encabezado autenticado con navegación principal y menú de usuario. -->
     <header class="site-header">
@@ -165,14 +165,17 @@
           </div>
           <div class="card appointment-empty-state" id="appointmentsEmptyState" hidden>
             <div class="card-body">
-              <p>Aún no tienes citas confirmadas.</p>
+              <p id="appointmentsEmptyMessage">Aún no tienes citas confirmadas.</p>
               <a class="btn btn-primary" href="registro-cita.html">Registrar una cita</a>
             </div>
+          </div>
+          <div class="card appointment-empty-state" id="appointmentsErrorState" role="alert" hidden>
+            <div class="card-body"></div>
           </div>
         </section>
 
         <!-- Historial de citas ya realizadas por el usuario. -->
-        <section class="history-section" aria-labelledby="history-title">
+        <section class="history-section" aria-labelledby="history-title" hidden>
           <h2 id="history-title" class="section-title appointments-section-title">Historial de citas</h2>
           <article class="card history-card">
             <div class="history-pet">
