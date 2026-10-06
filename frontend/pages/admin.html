@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Panel administrativo de VitaVet." />
+    <title>Panel administrativo | VitaVet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/variables.css" />
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+    <link rel="stylesheet" href="../css/admin.css" />
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js" defer></script>
+    <script src="../js/admin-usuarios.js" defer></script>
+    <script src="../js/admin-mascotas.js" defer></script>
+    <script src="../js/admin-veterinarios.js" defer></script>
+    <script src="../js/admin-servicios.js" defer></script>
+    <script src="../js/admin-citas.js" defer></script>
+    <script src="../js/admin-pagos.js" defer></script>
+  </head>
+  <body class="admin-page" hidden>
+    <header class="admin-topbar">
+      <div class="admin-topbar-brand">
+        <button class="admin-menu-toggle" id="adminMenuToggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="adminSidebar">☰</button>
+        <a class="admin-brand" href="admin.html">VitaVet</a>
+      </div>
+      <div class="admin-account-menu" id="adminAccountMenu">
+        <button class="admin-topbar-account" id="adminUserMenuToggle" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="adminUserDropdown">
+          <span class="admin-account-avatar" aria-hidden="true">V</span>
+          <span id="adminUserName">Usuario</span>
+        </button>
+        <div class="admin-account-dropdown" id="adminUserDropdown" role="menu" aria-label="Menú de usuario" hidden>
+          <a class="admin-account-dropdown-item" id="logoutButton" href="login.html" role="menuitem">🚪 Cerrar sesión</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="admin-shell">
+      <aside class="admin-sidebar" id="adminSidebar" aria-label="Menú administrativo">
+        <nav class="admin-navigation">
+          <a class="admin-nav-link is-active" href="admin.html" aria-current="page"><span aria-hidden="true">🏠</span> Dashboard</a>
+          <a class="admin-nav-link" href="#" data-coming-soon="Usuarios"><span aria-hidden="true">👥</span> Usuarios</a>
+          <a class="admin-nav-link" href="#" data-coming-soon="Mascotas"><span aria-hidden="true">🐾</span> Mascotas</a>
+          <a class="admin-nav-link" href="#" data-coming-soon="Veterinarios"><span aria-hidden="true">👨‍⚕️</span> Veterinarios</a>
+          <a class="admin-nav-link" href="#" data-coming-soon="Servicios"><span aria-hidden="true">🩺</span> Servicios</a>
+          <a class="admin-nav-link" href="#" data-coming-soon="Citas"><span aria-hidden="true">📅</span> Citas</a>
+          <a class="admin-nav-link" href="#" data-coming-soon="Pagos"><span aria-hidden="true">💳</span> Pagos</a>
+        </nav>
+        <div class="admin-sidebar-footer">
+          <a class="admin-nav-link" href="dashboard.html"><span aria-hidden="true">🌐</span> Ir al sitio</a>
+          <a class="admin-nav-link admin-logout dashboard-logout-item" href="login.html"><span aria-hidden="true">🚪</span> Cerrar sesión</a>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <div class="admin-content" id="adminDashboardContent">
+          <header class="admin-page-heading">
+            <p class="admin-eyebrow">VitaVet · Administración</p>
+            <h1>Panel administrativo</h1>
+            <p>Resumen general de VitaVet</p>
+          </header>
+
+          <div class="admin-feedback" id="adminFeedback" role="status" aria-live="polite" hidden></div>
+
+          <section aria-label="Resumen de registros">
+            <div class="admin-metric-grid">
+              <article class="admin-metric-card"><span class="admin-metric-icon" aria-hidden="true">👥</span><div><span class="admin-metric-label">Usuarios</span><strong class="admin-metric-value" id="countUsuarios">—</strong></div></article>
+              <article class="admin-metric-card"><span class="admin-metric-icon" aria-hidden="true">🐾</span><div><span class="admin-metric-label">Mascotas</span><strong class="admin-metric-value" id="countMascotas">—</strong></div></article>
+              <article class="admin-metric-card"><span class="admin-metric-icon" aria-hidden="true">👨‍⚕️</span><div><span class="admin-metric-label">Veterinarios</span><strong class="admin-metric-value" id="countVeterinarios">—</strong></div></article>
+              <article class="admin-metric-card"><span class="admin-metric-icon" aria-hidden="true">🩺</span><div><span class="admin-metric-label">Servicios</span><strong class="admin-metric-value" id="countServicios">—</strong></div></article>
+              <article class="admin-metric-card"><span class="admin-metric-icon" aria-hidden="true">📅</span><div><span class="admin-metric-label">Citas</span><strong class="admin-metric-value" id="countCitas">—</strong></div></article>
+              <article class="admin-metric-card"><span class="admin-metric-icon" aria-hidden="true">💳</span><div><span class="admin-metric-label">Pagos</span><strong class="admin-metric-value" id="countPagos">—</strong></div></article>
+            </div>
+          </section>
+
+          <section class="admin-recent-section" aria-labelledby="adminRecentTitle">
+            <div class="admin-section-heading">
+              <div><p class="admin-eyebrow">Actividad</p><h2 id="adminRecentTitle">Últimas citas</h2></div>
+              <span class="admin-section-caption">Registros recientes</span>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>Mascota</th><th>Servicio</th><th>Veterinario</th><th>Fecha</th><th>Hora</th><th>Estado</th></tr></thead>
+                <tbody id="adminRecentAppointments"><tr><td colspan="6" class="admin-table-message">Cargando citas...</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+        <div class="admin-content" id="adminUsersModule" hidden>
+          <header class="admin-page-heading">
+            <p class="admin-eyebrow">VitaVet · Administración</p>
+            <h1>Gestión de usuarios</h1>
+            <p>Administra las cuentas y roles registrados en VitaVet.</p>
+          </header>
+          <div class="admin-feedback" id="usersFeedback" role="status" aria-live="polite" hidden></div>
+          <section class="admin-recent-section admin-users-section" aria-labelledby="usersTableTitle">
+            <div class="admin-section-heading">
+              <div><p class="admin-eyebrow">Cuentas</p><h2 id="usersTableTitle">Usuarios registrados</h2></div>
+              <button class="admin-users-primary" id="newUserButton" type="button">+ Nuevo usuario</button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>ID</th><th>Nombre</th><th>Apellido</th><th>Correo</th><th>Teléfono</th><th>Rol</th><th>Acciones</th></tr></thead>
+                <tbody id="usersTableBody"><tr><td colspan="7" class="admin-table-message">Cargando usuarios...</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+        <div class="admin-content" id="adminPetsModule" hidden>
+          <header class="admin-page-heading">
+            <p class="admin-eyebrow">VitaVet · Administración</p>
+            <h1>Gestión de mascotas</h1>
+            <p>Administra las mascotas registradas y sus propietarios.</p>
+          </header>
+          <div class="admin-feedback" id="petsFeedback" role="status" aria-live="polite" hidden></div>
+          <section class="admin-recent-section admin-users-section" aria-labelledby="petsTableTitle">
+            <div class="admin-section-heading">
+              <div><p class="admin-eyebrow">Mascotas</p><h2 id="petsTableTitle">Mascotas registradas</h2></div>
+              <button class="admin-users-primary" id="newPetButton" type="button">+ Nueva mascota</button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>ID</th><th>Nombre</th><th>Tipo</th><th>Raza</th><th>Sexo</th><th>Edad</th><th>Propietario</th><th>Acciones</th></tr></thead>
+                <tbody id="petsTableBody"><tr><td colspan="8" class="admin-table-message">Cargando mascotas...</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+        <div class="admin-content" id="adminVeterinariansModule" hidden>
+          <header class="admin-page-heading">
+            <p class="admin-eyebrow">VitaVet · Administración</p>
+            <h1>Gestión de veterinarios</h1>
+            <p>Administra los profesionales registrados en VitaVet.</p>
+          </header>
+          <div class="admin-feedback" id="veterinariansFeedback" role="status" aria-live="polite" hidden></div>
+          <section class="admin-recent-section admin-users-section" aria-labelledby="veterinariansTableTitle">
+            <div class="admin-section-heading">
+              <div><p class="admin-eyebrow">Profesionales</p><h2 id="veterinariansTableTitle">Veterinarios registrados</h2></div>
+              <button class="admin-users-primary" id="newVeterinarianButton" type="button">+ Nuevo veterinario</button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>ID</th><th>Nombre</th><th>Apellido</th><th>Especialidad</th><th>Correo</th><th>Teléfono</th><th>Acciones</th></tr></thead>
+                <tbody id="veterinariansTableBody"><tr><td colspan="7" class="admin-table-message">Cargando veterinarios...</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+        <div class="admin-content" id="adminServicesModule" hidden>
+          <header class="admin-page-heading">
+            <p class="admin-eyebrow">VitaVet · Administración</p>
+            <h1>Gestión de servicios</h1>
+            <p>Administra los servicios veterinarios disponibles en VitaVet.</p>
+          </header>
+          <div class="admin-feedback" id="servicesFeedback" role="status" aria-live="polite" hidden></div>
+          <section class="admin-recent-section admin-users-section" aria-labelledby="servicesTableTitle">
+            <div class="admin-section-heading">
+              <div><p class="admin-eyebrow">Catálogo</p><h2 id="servicesTableTitle">Servicios registrados</h2></div>
+              <button class="admin-users-primary" id="newServiceButton" type="button">+ Nuevo servicio</button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>ID</th><th>Nombre</th><th>Descripción</th><th>Precio</th><th>Duración</th><th>Acciones</th></tr></thead>
+                <tbody id="servicesTableBody"><tr><td colspan="6" class="admin-table-message">Cargando servicios...</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+        <div class="admin-content" id="adminAppointmentsModule" hidden>
+          <header class="admin-page-heading">
+            <p class="admin-eyebrow">VitaVet · Administración</p>
+            <h1>Gestión de citas</h1>
+            <p>Administra las citas programadas y su estado.</p>
+          </header>
+          <div class="admin-feedback" id="appointmentsFeedback" role="status" aria-live="polite" hidden></div>
+          <section class="admin-recent-section admin-users-section" aria-labelledby="appointmentsTableTitle">
+            <div class="admin-section-heading">
+              <div><p class="admin-eyebrow">Agenda</p><h2 id="appointmentsTableTitle">Citas registradas</h2></div>
+              <button class="admin-users-primary" id="newAppointmentButton" type="button">+ Nueva cita</button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>ID</th><th>Mascota</th><th>Veterinario</th><th>Servicio</th><th>Fecha</th><th>Hora</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody id="appointmentsTableBody"><tr><td colspan="8" class="admin-table-message">Cargando citas...</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+        <div class="admin-content" id="adminPaymentsModule" hidden>
+          <header class="admin-page-heading">
+            <p class="admin-eyebrow">VitaVet · Administración</p>
+            <h1>Gestión de pagos</h1>
+            <p>Administra los pagos registrados de las citas.</p>
+          </header>
+          <div class="admin-feedback" id="paymentsFeedback" role="status" aria-live="polite" hidden></div>
+          <section class="admin-recent-section admin-users-section" aria-labelledby="paymentsTableTitle">
+            <div class="admin-section-heading">
+              <div><p class="admin-eyebrow">Pagos</p><h2 id="paymentsTableTitle">Pagos registrados</h2></div>
+              <button class="admin-users-primary" id="newPaymentButton" type="button">+ Nuevo pago</button>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead><tr><th>ID</th><th>Cita</th><th>Mascota</th><th>Modalidad</th><th>Método</th><th>Monto</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody id="paymentsTableBody"><tr><td colspan="8" class="admin-table-message">Cargando pagos...</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <dialog class="admin-user-dialog" id="userDialog" aria-labelledby="userDialogTitle">
+      <form id="userForm" class="admin-user-form">
+        <h2 id="userDialogTitle">Nuevo usuario</h2>
+        <label>Nombre<input name="nombre" type="text" maxlength="50" required /></label>
+        <label>Apellido<input name="apellido" type="text" maxlength="50" required /></label>
+        <label>Correo<input name="correo" type="email" maxlength="100" required /></label>
+        <label>Teléfono<input name="telefono" type="tel" maxlength="20" required /></label>
+        <label id="passwordField">Contraseña<input name="password" type="password" autocomplete="new-password" /></label>
+        <label>Rol<select name="rol" required><option value="CLIENTE">CLIENTE</option><option value="ADMIN">ADMIN</option></select></label>
+        <p class="admin-user-form-note" id="passwordNote" hidden>Déjala vacía para conservar la contraseña actual.</p>
+        <div class="admin-user-form-actions">
+          <button class="admin-users-secondary" id="cancelUserButton" type="button">Cancelar</button>
+          <button class="admin-users-primary" type="submit">Guardar</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog class="admin-user-dialog" id="petDialog" aria-labelledby="petDialogTitle">
+      <form id="petForm" class="admin-user-form">
+        <h2 id="petDialogTitle">Nueva mascota</h2>
+        <label>Nombre<input name="nombre" type="text" maxlength="50" required /></label>
+        <label>Tipo<input name="tipo" type="text" maxlength="30" required /></label>
+        <label>Raza<input name="raza" type="text" maxlength="50" required /></label>
+        <label>Sexo<input name="sexo" type="text" maxlength="20" required /></label>
+        <label>Edad<input name="edad" type="number" min="0" step="1" required /></label>
+        <label>Propietario<select name="idUsuario" required><option value="">Selecciona un propietario</option></select></label>
+        <div class="admin-user-form-actions">
+          <button class="admin-users-secondary" id="cancelPetButton" type="button">Cancelar</button>
+          <button class="admin-users-primary" type="submit">Guardar</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog class="admin-user-dialog" id="veterinarianDialog" aria-labelledby="veterinarianDialogTitle">
+      <form id="veterinarianForm" class="admin-user-form">
+        <h2 id="veterinarianDialogTitle">Nuevo veterinario</h2>
+        <label>Nombre<input name="nombre" type="text" maxlength="50" required /></label>
+        <label>Apellido<input name="apellido" type="text" maxlength="50" required /></label>
+        <label>Especialidad<input name="especialidad" type="text" maxlength="100" required /></label>
+        <label>Correo<input name="correo" type="email" maxlength="100" required /></label>
+        <label>Teléfono<input name="telefono" type="tel" maxlength="20" required /></label>
+        <div class="admin-user-form-actions">
+          <button class="admin-users-secondary" id="cancelVeterinarianButton" type="button">Cancelar</button>
+          <button class="admin-users-primary" type="submit">Guardar</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog class="admin-user-dialog" id="serviceDialog" aria-labelledby="serviceDialogTitle">
+      <form id="serviceForm" class="admin-user-form">
+        <h2 id="serviceDialogTitle">Nuevo servicio</h2>
+        <label>Nombre<input name="nombre" type="text" maxlength="100" required /></label>
+        <label>Descripción<textarea name="descripcion" maxlength="255" rows="3" required></textarea></label>
+        <label>Precio (S/)<input name="precio" type="number" min="0" max="99999999.99" step="0.01" required /></label>
+        <label>Duración en minutos<input name="duracionMinutos" type="number" min="1" max="2147483647" step="1" required /></label>
+        <div class="admin-user-form-actions">
+          <button class="admin-users-secondary" id="cancelServiceButton" type="button">Cancelar</button>
+          <button class="admin-users-primary" type="submit">Guardar</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog class="admin-user-dialog" id="appointmentDialog" aria-labelledby="appointmentDialogTitle">
+      <form id="appointmentForm" class="admin-user-form">
+        <h2 id="appointmentDialogTitle">Nueva cita</h2>
+        <label>Mascota<select name="idMascota" required><option value="">Selecciona una mascota</option></select></label>
+        <label>Veterinario<select name="idVeterinario" required><option value="">Selecciona un veterinario</option></select></label>
+        <label>Servicio<select name="idServicio" required><option value="">Selecciona un servicio</option></select></label>
+        <label>Fecha<input name="fecha" type="date" required /></label>
+        <label>Hora<input name="hora" type="time" required /></label>
+        <label id="appointmentStatusField" hidden>Estado<select name="estado" required><option value="Programada">Programada</option><option value="Completada">Completada</option><option value="Cancelada">Cancelada</option></select></label>
+        <p id="newAppointmentStatus" class="admin-user-form-note">El estado inicial será Programada.</p>
+        <div class="admin-user-form-actions">
+          <button class="admin-users-secondary" id="cancelAppointmentButton" type="button">Cancelar</button>
+          <button class="admin-users-primary" type="submit">Guardar</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog class="admin-user-dialog" id="paymentDialog" aria-labelledby="paymentDialogTitle">
+      <form id="paymentForm" class="admin-user-form">
+        <h2 id="paymentDialogTitle">Nuevo pago</h2>
+        <label>Cita<select name="idCita" required><option value="">Selecciona una cita</option></select></label>
+        <label>Modalidad<select name="modalidad" required><option value="online">online</option><option value="presencial">presencial</option></select></label>
+        <label>Método<select name="metodo" required><option value="tarjeta">tarjeta</option><option value="yape">yape</option><option value="efectivo">efectivo</option></select></label>
+        <label>Monto (S/)<input name="monto" type="number" min="0" max="99999999.99" step="0.01" required /></label>
+        <label>Estado<select name="estado" required><option value="Pendiente">Pendiente</option><option value="Pagado">Pagado</option><option value="Cancelado">Cancelado</option></select></label>
+        <div class="admin-user-form-actions">
+          <button class="admin-users-secondary" id="cancelPaymentButton" type="button">Cancelar</button>
+          <button class="admin-users-primary" type="submit">Guardar</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>

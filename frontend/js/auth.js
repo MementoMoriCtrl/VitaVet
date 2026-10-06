@@ -65,6 +65,7 @@
   };
 
   const getCurrentUser = () => validateSession() ? readUser() : null;
+  const getToken = () => validateSession() ? sessionStorage.getItem(TOKEN_KEY) : null;
 
   const logout = (event) => {
     event?.preventDefault();
@@ -72,9 +73,15 @@
     window.location.replace(LOGIN_URL);
   };
 
-  window.VitaVetAuth = { getCurrentUser, logout, validateSession };
+  window.VitaVetAuth = { getCurrentUser, getToken, logout, validateSession };
 
   if (!validateSession()) return;
+
+  if (window.location.pathname.endsWith("/dashboard.html")
+      && readUser()?.rol === "ADMIN") {
+    window.location.replace("admin.html");
+    return;
+  }
 
   const bindLogoutControls = () => {
     document.querySelectorAll("#logoutButton, .dashboard-logout-item").forEach((element) => {

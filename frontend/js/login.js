@@ -128,7 +128,7 @@ loginForm.addEventListener("submit", async (event) => {
 
     const dashboardByRole = {
       CLIENTE: "dashboard.html",
-      ADMIN: "dashboard.html",
+      ADMIN: "admin.html",
     };
     window.location.href = dashboardByRole[user.rol];
   } catch (error) {

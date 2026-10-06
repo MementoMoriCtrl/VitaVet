@@ -249,6 +249,55 @@ class AuthorizationIntegrationTest {
     }
 
     @Test
+    void adminPuedeCompletarCitaProgramadaPeroNoPuedeReabrirla() throws Exception {
+        String token = token(6, Rol.ADMIN);
+        Cita cita = cita(51, 21, "Programada");
+        when(citaRepository.findById(51)).thenReturn(Optional.of(cita));
+        when(citaRepository.save(any(Cita.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        mockMvc.perform(put("/api/citas/51").header("Authorization", bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON).content(citaJson(21, "Completada")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.estado").value("Completada"));
+        mockMvc.perform(put("/api/citas/51").header("Authorization", bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON).content(citaJson(21, "Programada")))
+                .andExpect(status().isConflict());
+
+        org.junit.jupiter.api.Assertions.assertEquals("Completada", cita.getEstado());
+        verify(citaRepository).save(cita);
+    }
+
+    @Test
+    void adminPuedeCancelarCitaProgramada() throws Exception {
+        String token = token(6, Rol.ADMIN);
+        Cita cita = cita(53, 21, "Programada");
+        when(citaRepository.findById(53)).thenReturn(Optional.of(cita));
+        when(citaRepository.save(any(Cita.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        mockMvc.perform(put("/api/citas/53").header("Authorization", bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON).content(citaJson(21, "Cancelada")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.estado").value("Cancelada"));
+    }
+
+    @Test
+    void adminNoPuedeCompletarCitaCanceladaNiUsarEstadosNoPermitidos() throws Exception {
+        String token = token(6, Rol.ADMIN);
+        Cita cita = cita(52, 21, "Cancelada");
+        when(citaRepository.findById(52)).thenReturn(Optional.of(cita));
+
+        mockMvc.perform(put("/api/citas/52").header("Authorization", bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON).content(citaJson(21, "Completada")))
+                .andExpect(status().isConflict());
+        mockMvc.perform(put("/api/citas/52").header("Authorization", bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON).content(citaJson(21, "Atendida")))
+                .andExpect(status().isConflict());
+
+        org.junit.jupiter.api.Assertions.assertEquals("Cancelada", cita.getEstado());
+        verify(citaRepository, never()).save(any(Cita.class));
+    }
+
+    @Test
     void clienteNoPuedeCancelarCitaAjenaNiCambiarSuMascota() throws Exception {
         String token = token(8, Rol.CLIENTE);
         when(citaRepository.findByIdCitaAndUsuarioId(32, 8)).thenReturn(Optional.empty());
@@ -286,6 +335,13 @@ class AuthorizationIntegrationTest {
         mockMvc.perform(put("/api/citas/31").header("Authorization", bearer(token))
                         .contentType(MediaType.APPLICATION_JSON).content(citaJson(21, "Cancelada")))
                 .andExpect(status().isConflict());
+        when(citaRepository.findByIdCitaAndUsuarioId(31, 8))
+                .thenReturn(Optional.of(cita(31, 21, "Completada")));
+        for (String estadoSolicitado : List.of("Cancelada", "Programada", "Completada")) {
+            mockMvc.perform(put("/api/citas/31").header("Authorization", bearer(token))
+                            .contentType(MediaType.APPLICATION_JSON).content(citaJson(21, estadoSolicitado)))
+                    .andExpect(status().isConflict());
+        }
         verify(citaRepository, never()).save(any(Cita.class));
     }
 
@@ -370,7 +426,7 @@ class AuthorizationIntegrationTest {
         when(usuarioRepository.findById(6)).thenReturn(Optional.of(usuario(6, Rol.ADMIN)));
         when(usuarioRepository.existsById(6)).thenReturn(true);
         when(mascotaRepository.findById(21)).thenReturn(Optional.of(mascota(21, 8)));
-        when(citaRepository.findById(31)).thenReturn(Optional.of(new Cita()));
+        when(citaRepository.findById(31)).thenReturn(Optional.of(cita(31, 21, "Programada")));
         when(pagoRepository.findById(41)).thenReturn(Optional.of(new Pago()));
         when(veterinarioRepository.findById(61)).thenReturn(Optional.of(new Veterinario()));
         when(veterinarioRepository.existsById(61)).thenReturn(true);
@@ -387,7 +443,7 @@ class AuthorizationIntegrationTest {
                 .andExpect(status().isOk());
         mockMvc.perform(put("/api/citas/31").header("Authorization", bearer(token))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"idMascota\":21,\"idVeterinario\":1,\"idServicio\":1,\"fecha\":\"2026-10-01\",\"hora\":\"10:00:00\",\"estado\":\"Confirmada\"}"))
+                        .content("{\"idMascota\":21,\"idVeterinario\":1,\"idServicio\":1,\"fecha\":\"2026-10-01\",\"hora\":\"10:00:00\",\"estado\":\"Completada\"}"))
                 .andExpect(status().isOk());
         mockMvc.perform(put("/api/pagos/41").header("Authorization", bearer(token))
                         .contentType(MediaType.APPLICATION_JSON)

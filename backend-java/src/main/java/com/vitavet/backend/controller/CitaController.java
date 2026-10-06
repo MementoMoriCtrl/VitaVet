@@ -72,12 +72,20 @@ public class CitaController {
                         cita.setEstado("Cancelada");
                         return ResponseEntity.ok(citaRepository.save(cita));
                     }
+                    String nuevoEstado = datosCita.getEstado();
+                    if (nuevoEstado == null || !List.of("Programada", "Completada", "Cancelada").contains(nuevoEstado)) {
+                        return ResponseEntity.status(409).<Cita>build();
+                    }
+                    if (("Completada".equals(cita.getEstado()) && "Programada".equals(nuevoEstado))
+                            || ("Cancelada".equals(cita.getEstado()) && "Completada".equals(nuevoEstado))) {
+                        return ResponseEntity.status(409).<Cita>build();
+                    }
                     cita.setIdMascota(datosCita.getIdMascota());
                     cita.setIdVeterinario(datosCita.getIdVeterinario());
                     cita.setIdServicio(datosCita.getIdServicio());
                     cita.setFecha(datosCita.getFecha());
                     cita.setHora(datosCita.getHora());
-                    cita.setEstado(datosCita.getEstado());
+                    cita.setEstado(nuevoEstado);
 
                     return ResponseEntity.ok(citaRepository.save(cita));
                 })
