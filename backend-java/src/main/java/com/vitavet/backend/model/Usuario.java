@@ -18,6 +18,12 @@ public class Usuario {
     @Column(name = "apellido", nullable = false, length = 50)
     private String apellido;
 
+    @Column(name = "dni", nullable = false, length = 20)
+    private String dni;
+
+    @Column(name = "nombre_usuario", nullable = false, length = 50)
+    private String nombreUsuario;
+
     @Column(name = "correo", nullable = false, unique = true, length = 100)
     private String correo;
 
@@ -30,6 +36,10 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     @Column(name = "rol", nullable = false, length = 20)
     private Rol rol = Rol.CLIENTE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = false, length = 20)
+    private EstadoUsuario estado = EstadoUsuario.PENDIENTE;
 
     public Usuario() {
     }
@@ -56,6 +66,22 @@ public class Usuario {
 
     public void setApellido(String apellido) {
         this.apellido = apellido;
+    }
+
+    public String getDni() {
+        return dni;
+    }
+
+    public void setDni(String dni) {
+        this.dni = dni;
+    }
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
     }
 
     public String getCorreo() {
@@ -89,5 +115,13 @@ public class Usuario {
 
     public void setRol(Rol rol) {
         this.rol = rol;
+    }
+
+    public EstadoUsuario getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoUsuario estado) {
+        this.estado = estado;
     }
 }

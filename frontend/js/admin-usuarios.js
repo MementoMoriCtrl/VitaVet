@@ -6,6 +6,7 @@
 
   const tableBody = document.querySelector("#usersTableBody");
   const feedback = document.querySelector("#usersFeedback");
+  const formFeedback = document.querySelector("#userFormFeedback");
   const dialog = document.querySelector("#userDialog");
   const form = document.querySelector("#userForm");
   const title = document.querySelector("#userDialogTitle");
@@ -15,16 +16,27 @@
   let users = [];
   let editingId = null;
 
-  const showFeedback = (message, isError = false) => {
-    feedback.textContent = message;
-    feedback.hidden = false;
-    feedback.classList.toggle("is-error", isError);
+  const clearFeedback = (element) => {
+    element.hidden = true;
+    element.classList.remove("is-error");
+    element.classList.remove("is-success");
+    element.querySelector("[data-feedback-message]").textContent = "";
   };
+
+  const showFeedback = (element, message, isError = false) => {
+    element.querySelector("[data-feedback-message]").textContent = message;
+    element.hidden = false;
+    element.classList.toggle("is-error", isError);
+    element.classList.toggle("is-success", !isError);
+  };
+
+  feedback.querySelector(".admin-feedback-close").addEventListener("click", () => clearFeedback(feedback));
+  formFeedback.querySelector(".admin-feedback-close").addEventListener("click", () => clearFeedback(formFeedback));
 
   const errorMessage = (status) => ({
     403: "No tienes permisos para realizar esta acción.",
     404: "Usuario no encontrado.",
-    409: "El correo ya está registrado.",
+    409: "El correo, DNI o nombre de usuario ya está registrado.",
     400: "Los datos ingresados no son válidos.",
     500: "Ocurrió un error del servidor. Inténtalo más tarde."
   }[status] || "No se pudo completar la operación.");
@@ -49,7 +61,7 @@
     }
     if (!response.ok) {
       let message = errorMessage(response.status);
-      if (response.status === 409) {
+      if (response.status === 400 || response.status === 409) {
         try {
           const data = await response.json();
           if (typeof data.message === "string" && data.message.trim()) message = data.message;
@@ -70,15 +82,30 @@
     row.append(cell);
   };
 
+  const addStatusCell = (row, status) => {
+    const cell = document.createElement("td");
+    if (!status) {
+      cell.textContent = "No disponible";
+      row.append(cell);
+      return;
+    }
+    const badge = document.createElement("span");
+    badge.className = `admin-user-status is-${String(status).toLowerCase()}`;
+    badge.textContent = String(status);
+    cell.append(badge);
+    row.append(cell);
+  };
+
   const renderUsers = () => {
     if (!users.length) {
-      tableBody.innerHTML = '<tr><td colspan="7" class="admin-table-message">No hay usuarios registrados.</td></tr>';
+      tableBody.innerHTML = '<tr><td colspan="10" class="admin-table-message">No hay usuarios registrados.</td></tr>';
       return;
     }
     const rows = users.map((user) => {
       const row = document.createElement("tr");
-      [user.idUsuario, user.nombre, user.apellido, user.correo, user.telefono, user.rol]
+      [user.idUsuario, user.nombre, user.apellido, user.dni, user.nombreUsuario, user.correo, user.telefono, user.rol]
         .forEach((value) => addCell(row, value));
+      addStatusCell(row, user.estado);
       const actions = document.createElement("td");
       actions.className = "admin-user-actions";
       const editButton = document.createElement("button");
@@ -98,8 +125,8 @@
     tableBody.replaceChildren(...rows);
   };
 
-  const loadUsers = async () => {
-    tableBody.innerHTML = '<tr><td colspan="7" class="admin-table-message">Cargando usuarios...</td></tr>';
+  const loadUsers = async (preserveFeedbackOnError = false) => {
+    tableBody.innerHTML = '<tr><td colspan="10" class="admin-table-message">Cargando usuarios...</td></tr>';
     try {
       const data = await request("");
       if (!Array.isArray(data)) throw new Error("La respuesta de usuarios no es válida.");
@@ -108,20 +135,25 @@
       if (counter) counter.textContent = String(users.length);
       renderUsers();
     } catch (error) {
-      tableBody.innerHTML = '<tr><td colspan="7" class="admin-table-message">No se pudieron cargar los usuarios.</td></tr>';
-      showFeedback(error.message, true);
+      tableBody.innerHTML = '<tr><td colspan="10" class="admin-table-message">No se pudieron cargar los usuarios.</td></tr>';
+      if (!preserveFeedbackOnError) showFeedback(feedback, error.message, true);
     }
   };
 
   const openForm = (user = null) => {
     editingId = user?.idUsuario ?? null;
+    clearFeedback(feedback);
+    clearFeedback(formFeedback);
     form.reset();
     title.textContent = editingId ? "Editar usuario" : "Nuevo usuario";
     form.elements.nombre.value = user?.nombre || "";
     form.elements.apellido.value = user?.apellido || "";
+    form.elements.dni.value = user?.dni || "";
+    form.elements.nombreUsuario.value = user?.nombreUsuario || "";
     form.elements.correo.value = user?.correo || "";
     form.elements.telefono.value = user?.telefono || "";
     form.elements.rol.value = user?.rol || "CLIENTE";
+    form.elements.estado.value = user?.estado || "PENDIENTE";
     passwordInput.required = !editingId;
     passwordInput.value = "";
     passwordNote.hidden = !editingId;
@@ -133,7 +165,7 @@
       const user = await request(`/${encodeURIComponent(id)}`);
       openForm(user);
     } catch (error) {
-      showFeedback(error.message, true);
+      showFeedback(feedback, error.message, true);
     }
   };
 
@@ -146,10 +178,10 @@
     if (!window.confirm(prompt)) return;
     try {
       await request(`/${encodeURIComponent(user.idUsuario)}`, { method: "DELETE" });
-      showFeedback("Usuario eliminado correctamente.");
-      await loadUsers();
+      showFeedback(feedback, "Usuario eliminado correctamente.");
+      await loadUsers(true);
     } catch (error) {
-      showFeedback(error.message, true);
+      showFeedback(feedback, error.message, true);
     }
   };
 
@@ -160,23 +192,34 @@
     const payload = {
       nombre: form.elements.nombre.value.trim(),
       apellido: form.elements.apellido.value.trim(),
+      dni: form.elements.dni.value.trim(),
+      nombreUsuario: form.elements.nombreUsuario.value.trim(),
       correo: form.elements.correo.value.trim(),
       telefono: form.elements.telefono.value.trim(),
-      rol: form.elements.rol.value
+      rol: form.elements.rol.value,
+      estado: form.elements.estado.value
     };
     const password = passwordInput.value;
     if (!editingId || password.trim()) payload.password = password;
     const isEditing = Boolean(editingId);
+    clearFeedback(formFeedback);
     try {
       await request(isEditing ? `/${encodeURIComponent(editingId)}` : "", {
         method: isEditing ? "PUT" : "POST",
         body: JSON.stringify(payload)
       });
       dialog.close();
-      showFeedback(isEditing ? "Usuario actualizado correctamente." : "Usuario creado correctamente.");
-      await loadUsers();
+      showFeedback(feedback, isEditing ? "Usuario actualizado correctamente." : "Usuario agregado correctamente");
+      await loadUsers(true);
     } catch (error) {
-      showFeedback(error.message, true);
+      const identityConflict = error.status === 409
+        && ["El DNI ya está registrado", "El nombre de usuario ya está registrado"].includes(error.message);
+      if (!isEditing && identityConflict) {
+        dialog.close();
+        showFeedback(feedback, error.message, true);
+      } else {
+        showFeedback(formFeedback, error.message, true);
+      }
     }
   });
 

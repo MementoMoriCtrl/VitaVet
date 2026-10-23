@@ -12,10 +12,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Instant;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 import com.vitavet.backend.model.Cita;
+import com.vitavet.backend.model.EstadoUsuario;
 import com.vitavet.backend.model.Mascota;
 import com.vitavet.backend.model.Pago;
 import com.vitavet.backend.model.Rol;
@@ -33,6 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -421,6 +425,189 @@ class AuthorizationIntegrationTest {
     }
 
     @Test
+    void listadoAdministrativoIncluyeDniNombreUsuarioYEstado() throws Exception {
+        Usuario usuario = usuario(7, Rol.ADMIN);
+        usuario.setDni("TEST-VV-0000000007");
+        usuario.setNombreUsuario("admin_vitavet_7");
+        usuario.setEstado(EstadoUsuario.ACTIVO);
+        when(usuarioRepository.findAll()).thenReturn(List.of(usuario));
+
+        mockMvc.perform(get("/api/usuarios")
+                        .header("Authorization", bearer(token(7, Rol.ADMIN))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].dni").value("TEST-VV-0000000007"))
+                .andExpect(jsonPath("$[0].nombreUsuario").value("admin_vitavet_7"))
+                .andExpect(jsonPath("$[0].estado").value("ACTIVO"))
+                .andExpect(jsonPath("$[0].password").doesNotExist());
+    }
+
+    @Test
+    void crearUsuarioRechazaDniDuplicadoSinGuardar() throws Exception {
+        when(usuarioRepository.existsByCorreo("nuevo@vitavet.test")).thenReturn(false);
+        when(usuarioRepository.existsByDni("TEST-VV-7")).thenReturn(true);
+
+        mockMvc.perform(post("/api/usuarios")
+                        .header("Authorization", bearer(token(7, Rol.ADMIN)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(usuarioNuevoJson("TEST-VV-7", "nuevo_usuario")))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("El DNI ya está registrado"));
+
+        verify(usuarioRepository, never()).save(any(Usuario.class));
+    }
+
+    @Test
+    void crearUsuarioRechazaNombreUsuarioDuplicadoSinGuardar() throws Exception {
+        when(usuarioRepository.existsByCorreo("nuevo@vitavet.test")).thenReturn(false);
+        when(usuarioRepository.existsByDni("TEST-VV-NUEVO")).thenReturn(false);
+        when(usuarioRepository.existsByNombreUsuario("usuario7")).thenReturn(true);
+
+        mockMvc.perform(post("/api/usuarios")
+                        .header("Authorization", bearer(token(7, Rol.ADMIN)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(usuarioNuevoJson("TEST-VV-NUEVO", "usuario7")))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("El nombre de usuario ya está registrado"));
+
+        verify(usuarioRepository, never()).save(any(Usuario.class));
+    }
+
+    @Test
+    void crearUsuarioConIdentificadoresUnicosSeGuarda() throws Exception {
+        when(usuarioRepository.existsByCorreo("nuevo@vitavet.test")).thenReturn(false);
+        when(usuarioRepository.existsByDni("TEST-VV-NUEVO")).thenReturn(false);
+        when(usuarioRepository.existsByNombreUsuario("nuevo_usuario")).thenReturn(false);
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        mockMvc.perform(post("/api/usuarios")
+                        .header("Authorization", bearer(token(7, Rol.ADMIN)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(usuarioNuevoJson("TEST-VV-NUEVO", "nuevo_usuario")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dni").value("TEST-VV-NUEVO"))
+                .andExpect(jsonPath("$.nombreUsuario").value("nuevo_usuario"))
+                .andExpect(jsonPath("$.password").doesNotExist());
+
+        verify(usuarioRepository).save(any(Usuario.class));
+    }
+
+    @Test
+    void actualizarUsuarioRechazaDniDeOtraCuentaConMensajeEspecifico() throws Exception {
+        when(usuarioRepository.findById(6)).thenReturn(Optional.of(usuario(6, Rol.ADMIN)));
+        when(usuarioRepository.existsByCorreoAndIdUsuarioNot("usuario6@vitavet.test", 6)).thenReturn(false);
+        when(usuarioRepository.existsByDniAndIdUsuarioNot("TEST-VV-7", 6)).thenReturn(true);
+
+        mockMvc.perform(put("/api/usuarios/6")
+                        .header("Authorization", bearer(token(7, Rol.ADMIN)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"dni\":\"TEST-VV-7\"}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("El DNI ya está registrado"));
+
+        verify(usuarioRepository, never()).save(any(Usuario.class));
+    }
+
+    @Test
+    void actualizarUsuarioRechazaNombreDeUsuarioDeOtraCuentaConMensajeEspecifico() throws Exception {
+        when(usuarioRepository.findById(6)).thenReturn(Optional.of(usuario(6, Rol.ADMIN)));
+        when(usuarioRepository.existsByCorreoAndIdUsuarioNot("usuario6@vitavet.test", 6)).thenReturn(false);
+        when(usuarioRepository.existsByDniAndIdUsuarioNot("TEST-VV-6", 6)).thenReturn(false);
+        when(usuarioRepository.existsByNombreUsuarioAndIdUsuarioNot("usuario7", 6)).thenReturn(true);
+
+        mockMvc.perform(put("/api/usuarios/6")
+                        .header("Authorization", bearer(token(7, Rol.ADMIN)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nombreUsuario\":\"usuario7\"}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("El nombre de usuario ya está registrado"));
+
+        verify(usuarioRepository, never()).save(any(Usuario.class));
+    }
+
+    @Test
+    void actualizarUsuarioPermiteConservarSusIdentificadoresActuales() throws Exception {
+        when(usuarioRepository.findById(6)).thenReturn(Optional.of(usuario(6, Rol.ADMIN)));
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        mockMvc.perform(put("/api/usuarios/6")
+                        .header("Authorization", bearer(token(7, Rol.ADMIN)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"dni\":\"TEST-VV-6\",\"nombreUsuario\":\"usuario6\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dni").value("TEST-VV-6"))
+                .andExpect(jsonPath("$.nombreUsuario").value("usuario6"));
+
+        verify(usuarioRepository).existsByDniAndIdUsuarioNot("TEST-VV-6", 6);
+        verify(usuarioRepository).existsByNombreUsuarioAndIdUsuarioNot("usuario6", 6);
+    }
+
+    @Test
+    void conflictoDeIndiceUnicoEnBaseSeDevuelveConMensajeEspecifico() throws Exception {
+        when(usuarioRepository.existsByCorreo("nuevo@vitavet.test")).thenReturn(false);
+        when(usuarioRepository.existsByDni("TEST-VV-NUEVO")).thenReturn(false);
+        when(usuarioRepository.existsByNombreUsuario("nuevo_usuario")).thenReturn(false);
+        when(usuarioRepository.save(any(Usuario.class))).thenThrow(
+                new DataIntegrityViolationException("conflicto único",
+                        new ConstraintViolationException("conflicto único", new SQLException(), "uq_usuario_dni")));
+
+        mockMvc.perform(post("/api/usuarios")
+                        .header("Authorization", bearer(token(7, Rol.ADMIN)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(usuarioNuevoJson("TEST-VV-NUEVO", "nuevo_usuario")))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("El DNI ya está registrado"));
+    }
+
+    @Test
+    void conflictoDeIndiceUnicoDeNombreUsuarioSeDevuelveConMensajeEspecifico() throws Exception {
+        when(usuarioRepository.existsByCorreo("nuevo@vitavet.test")).thenReturn(false);
+        when(usuarioRepository.existsByDni("TEST-VV-NUEVO")).thenReturn(false);
+        when(usuarioRepository.existsByNombreUsuario("nuevo_usuario")).thenReturn(false);
+        when(usuarioRepository.save(any(Usuario.class))).thenThrow(
+                new DataIntegrityViolationException("conflicto único",
+                        new ConstraintViolationException("conflicto único", new SQLException(),
+                                "vitavet.uq_usuario_nombre_usuario")));
+
+        mockMvc.perform(post("/api/usuarios")
+                        .header("Authorization", bearer(token(7, Rol.ADMIN)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(usuarioNuevoJson("TEST-VV-NUEVO", "nuevo_usuario")))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("El nombre de usuario ya está registrado"));
+    }
+
+    @Test
+    void conflictoConcurrenteDeDniAlEditarDevuelveMensajeEspecifico() throws Exception {
+        when(usuarioRepository.findById(6)).thenReturn(Optional.of(usuario(6, Rol.ADMIN)));
+        when(usuarioRepository.save(any(Usuario.class))).thenThrow(
+                new DataIntegrityViolationException("conflicto único",
+                        new ConstraintViolationException("conflicto único", new SQLException(), "uq_usuario_dni")));
+
+        mockMvc.perform(put("/api/usuarios/6")
+                        .header("Authorization", bearer(token(7, Rol.ADMIN)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"dni\":\"TEST-VV-NUEVO\"}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("El DNI ya está registrado"));
+    }
+
+    @Test
+    void conflictoConcurrenteDeNombreUsuarioAlEditarDevuelveMensajeEspecifico() throws Exception {
+        when(usuarioRepository.findById(6)).thenReturn(Optional.of(usuario(6, Rol.ADMIN)));
+        when(usuarioRepository.save(any(Usuario.class))).thenThrow(
+                new DataIntegrityViolationException("conflicto único",
+                        new ConstraintViolationException("conflicto único", new SQLException(),
+                                "uq_usuario_nombre_usuario")));
+
+        mockMvc.perform(put("/api/usuarios/6")
+                        .header("Authorization", bearer(token(7, Rol.ADMIN)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nombreUsuario\":\"nuevo_usuario\"}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("El nombre de usuario ya está registrado"));
+    }
+
+    @Test
     void adminPuedeActualizarYEliminarRegistrosDeTodosLosCrud() throws Exception {
         String token = token(6, Rol.ADMIN);
         when(usuarioRepository.findById(6)).thenReturn(Optional.of(usuario(6, Rol.ADMIN)));
@@ -571,15 +758,25 @@ class AuthorizationIntegrationTest {
         return "Bearer " + token;
     }
 
+    private String usuarioNuevoJson(String dni, String nombreUsuario) {
+        return "{\"nombre\":\"Nuevo\",\"apellido\":\"Usuario\",\"dni\":\"" + dni
+                + "\",\"nombreUsuario\":\"" + nombreUsuario
+                + "\",\"correo\":\"nuevo@vitavet.test\",\"telefono\":\"999999999\","
+                + "\"password\":\"ClaveSegura123\"}";
+    }
+
     private Usuario usuario(Integer id, Rol rol) {
         Usuario usuario = new Usuario();
         usuario.setIdUsuario(id);
         usuario.setNombre("Usuario");
         usuario.setApellido("Prueba");
+        usuario.setDni("TEST-VV-" + id);
+        usuario.setNombreUsuario("usuario" + id);
         usuario.setCorreo("usuario" + id + "@vitavet.test");
         usuario.setPassword("hash-no-expuesto");
         usuario.setTelefono("999999999");
         usuario.setRol(rol);
+        usuario.setEstado(EstadoUsuario.PENDIENTE);
         return usuario;
     }
 

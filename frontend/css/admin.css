@@ -224,6 +224,10 @@ button.admin-topbar-account:focus-visible {
 }
 
 .admin-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 1.25rem;
   padding: 0.85rem 1rem;
   border: 1px solid var(--color-border);
@@ -235,7 +239,41 @@ button.admin-topbar-account:focus-visible {
 
 .admin-feedback.is-error {
   border-color: #e6c8c3;
+  background: #fff7f6;
   color: var(--color-danger);
+}
+
+.admin-feedback.is-success {
+  border-color: #c9e4d3;
+  background: #f2fbf5;
+  color: var(--color-success);
+}
+
+.admin-feedback[hidden],
+.admin-form-feedback[hidden] {
+  display: none;
+}
+
+.admin-feedback-close {
+  display: inline-grid;
+  flex: 0 0 2.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.admin-feedback-close:hover,
+.admin-feedback-close:focus-visible {
+  background: rgb(0 0 0 / 6%);
 }
 
 .admin-metric-grid {
@@ -321,6 +359,10 @@ button.admin-topbar-account:focus-visible {
   text-align: left;
 }
 
+.admin-users-table {
+  min-width: 68rem;
+}
+
 .admin-table th,
 .admin-table td {
   padding: 0.85rem 0.7rem;
@@ -392,6 +434,32 @@ button.admin-topbar-account:focus-visible {
   color: var(--color-danger);
 }
 
+.admin-user-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-soft);
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.admin-user-status.is-pendiente {
+  background: #fff3d6;
+  color: #805900;
+}
+
+.admin-user-status.is-activo {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.admin-user-status.is-anulado {
+  background: #f9e8e8;
+  color: var(--color-danger);
+}
+
 .admin-user-dialog {
   width: min(32rem, calc(100vw - 2rem));
   max-height: calc(100vh - 2rem);
@@ -412,6 +480,25 @@ button.admin-topbar-account:focus-visible {
   display: grid;
   gap: 0.9rem;
   padding: 1.5rem;
+}
+
+.admin-form-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #e6c8c3;
+  border-radius: var(--radius-sm);
+  background: #fff7f6;
+  color: var(--color-danger);
+  font-size: 0.84rem;
+}
+
+.admin-form-feedback.is-success {
+  border-color: #c9e4d3;
+  background: #f2fbf5;
+  color: var(--color-success);
 }
 
 .admin-user-form h2 {

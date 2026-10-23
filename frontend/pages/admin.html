@@ -96,16 +96,19 @@
             <h1>Gestión de usuarios</h1>
             <p>Administra las cuentas y roles registrados en VitaVet.</p>
           </header>
-          <div class="admin-feedback" id="usersFeedback" role="status" aria-live="polite" hidden></div>
+          <div class="admin-feedback" id="usersFeedback" role="alert" aria-atomic="true" hidden>
+            <span data-feedback-message></span>
+            <button class="admin-feedback-close" type="button" aria-label="Cerrar alerta">×</button>
+          </div>
           <section class="admin-recent-section admin-users-section" aria-labelledby="usersTableTitle">
             <div class="admin-section-heading">
               <div><p class="admin-eyebrow">Cuentas</p><h2 id="usersTableTitle">Usuarios registrados</h2></div>
               <button class="admin-users-primary" id="newUserButton" type="button">+ Nuevo usuario</button>
             </div>
             <div class="admin-table-wrap">
-              <table class="admin-table">
-                <thead><tr><th>ID</th><th>Nombre</th><th>Apellido</th><th>Correo</th><th>Teléfono</th><th>Rol</th><th>Acciones</th></tr></thead>
-                <tbody id="usersTableBody"><tr><td colspan="7" class="admin-table-message">Cargando usuarios...</td></tr></tbody>
+              <table class="admin-table admin-users-table">
+                <thead><tr><th>ID</th><th>Nombre</th><th>Apellido</th><th>DNI</th><th>Nombre de usuario</th><th>Correo</th><th>Teléfono</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody id="usersTableBody"><tr><td colspan="10" class="admin-table-message">Cargando usuarios...</td></tr></tbody>
               </table>
             </div>
           </section>
@@ -216,12 +219,19 @@
     <dialog class="admin-user-dialog" id="userDialog" aria-labelledby="userDialogTitle">
       <form id="userForm" class="admin-user-form">
         <h2 id="userDialogTitle">Nuevo usuario</h2>
+        <div class="admin-form-feedback" id="userFormFeedback" role="alert" aria-atomic="true" hidden>
+          <span data-feedback-message></span>
+          <button class="admin-feedback-close" type="button" aria-label="Cerrar alerta">×</button>
+        </div>
         <label>Nombre<input name="nombre" type="text" maxlength="50" required /></label>
         <label>Apellido<input name="apellido" type="text" maxlength="50" required /></label>
+        <label>DNI<input name="dni" type="text" maxlength="20" autocomplete="off" required /></label>
+        <label>Nombre de usuario<input name="nombreUsuario" type="text" maxlength="50" autocomplete="username" required /></label>
         <label>Correo<input name="correo" type="email" maxlength="100" required /></label>
         <label>Teléfono<input name="telefono" type="tel" maxlength="20" required /></label>
         <label id="passwordField">Contraseña<input name="password" type="password" autocomplete="new-password" /></label>
         <label>Rol<select name="rol" required><option value="CLIENTE">CLIENTE</option><option value="ADMIN">ADMIN</option></select></label>
+        <label>Estado<select name="estado" required><option value="PENDIENTE">PENDIENTE</option><option value="ACTIVO">ACTIVO</option><option value="ANULADO">ANULADO</option></select></label>
         <p class="admin-user-form-note" id="passwordNote" hidden>Déjala vacía para conservar la contraseña actual.</p>
         <div class="admin-user-form-actions">
           <button class="admin-users-secondary" id="cancelUserButton" type="button">Cancelar</button>
