@@ -9,7 +9,12 @@
 // =====================================================
 // Guarda referencias a los campos y mensajes que serán usados por el formulario.
 const registerForm = document.querySelector("#registerForm");
-const fullNameInput = document.querySelector("#fullName");
+const nombreInput = document.querySelector("#nombre");
+const apellidoInput = document.querySelector("#apellido");
+const dniInput = document.querySelector("#dni");
+const submitButton = registerForm.querySelector('[type="submit"]');
+const API_REGISTRO_URL = "http://localhost:8080/api/auth/registro";
+let registroEnCurso = false;
 const emailInput = document.querySelector("#email");
 const phoneInput = document.querySelector("#phone");
 const passwordInput = document.querySelector("#password");
@@ -41,7 +46,9 @@ const showValidationMessage = (input) => {
 
   if (input.validity.valueMissing) {
     const messages = {
-      fullName: "Ingresa tu nombre completo.",
+      nombre: "Ingresa tu nombre.",
+      apellido: "Ingresa tu apellido.",
+      dni: "Ingresa tu DNI.",
       email: "Ingresa tu correo electrónico.",
       phone: "Ingresa tu teléfono.",
       password: "Ingresa una contraseña.",
@@ -88,8 +95,8 @@ passwordConfirmationToggle.addEventListener("click", () => {
   togglePasswordVisibility(passwordConfirmationInput, passwordConfirmationToggle);
 });
 
-// Valida el registro y navega al inicio de sesión cuando todos los datos son correctos.
-registerForm.addEventListener("submit", (event) => {
+// Envía el registro y navega al inicio de sesión solo tras confirmar su creación.
+registerForm.addEventListener("submit", async (event) => {
   // Impide el envío tradicional para procesar las validaciones en el navegador.
   event.preventDefault();
   setFormMessage("");
@@ -112,11 +119,58 @@ registerForm.addEventListener("submit", (event) => {
     return;
   }
 
-  window.location.href = "login.html";
+  if (new TextEncoder().encode(passwordInput.value).length > 72) {
+    setFormMessage("La contraseña no puede superar 72 bytes UTF-8; las tildes y emojis ocupan varios bytes.");
+    return;
+  }
+  if (registroEnCurso) return;
+  registroEnCurso = true;
+  submitButton.disabled = true;
+  try {
+    let response;
+    try {
+      response = await fetch(API_REGISTRO_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: nombreInput.value.trim(),
+          apellido: apellidoInput.value.trim(),
+          dni: dniInput.value.trim(),
+          correo: emailInput.value.trim(),
+          telefono: phoneInput.value.trim(),
+          password: passwordInput.value
+        })
+      });
+    } catch {
+      setFormMessage("No se pudo conectar con el servidor. Verifica que VitaVet Backend esté ejecutándose.");
+      return;
+    }
+    if (response.status !== 201) {
+      const messages = {
+        400: "Revisa los campos y sus longitudes. Ingresa un correo válido.",
+        409: "El DNI o correo ya está registrado.",
+        401: "El servidor no permite el registro público. Contacta con soporte.",
+        403: "El servidor no permite el registro público. Contacta con soporte."
+      };
+      let message = messages[response.status] || "No se pudo crear la cuenta. Inténtalo más tarde.";
+      if ([400, 409].includes(response.status)) {
+        try {
+          const data = await response.json();
+          if (typeof data.message === "string" && data.message.trim()) message = data.message;
+        } catch { /* Mantener el mensaje según el estado HTTP. */ }
+      }
+      setFormMessage(message);
+      return;
+    }
+    window.location.href = "login.html";
+  } finally {
+    registroEnCurso = false;
+    submitButton.disabled = false;
+  }
 });
 
 // Recorre el arreglo de campos y registra los eventos comunes de validación.
-[fullNameInput, emailInput, phoneInput, passwordInput, passwordConfirmationInput, termsInput]
+[nombreInput, apellidoInput, dniInput, emailInput, phoneInput, passwordInput, passwordConfirmationInput, termsInput]
   .forEach((input) => {
     input.addEventListener("input", () => setFormMessage(""));
     input.addEventListener("change", () => setFormMessage(""));

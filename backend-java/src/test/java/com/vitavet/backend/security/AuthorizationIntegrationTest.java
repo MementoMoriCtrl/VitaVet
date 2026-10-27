@@ -46,7 +46,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.mockito.ArgumentCaptor;
 
-@SpringBootTest
+@SpringBootTest(properties = "spring.autoconfigure.exclude="
+        + "org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration,"
+        + "org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration,"
+        + "org.springframework.boot.data.jpa.autoconfigure.DataJpaRepositoriesAutoConfiguration")
 @AutoConfigureMockMvc
 class AuthorizationIntegrationTest {
 
@@ -73,6 +76,147 @@ class AuthorizationIntegrationTest {
 
     @MockitoBean
     private ServicioRepository servicioRepository;
+
+    private static final String REGISTRO = "{\"nombre\":\" Sofia \",\"apellido\":\" Perez \","
+            + "\"dni\":\"12345678\",\"correo\":\"sofia@example.com\","
+            + "\"telefono\":\"999999999\",\"password\":\"clave-segura\"}";
+
+    @Test
+    void loginDeniegaEstadosNoActivosSinTokenNiSesion() throws Exception {
+        for (EstadoUsuario estado : List.of(EstadoUsuario.PENDIENTE, EstadoUsuario.ANULADO)) {
+            Usuario usuario = usuario(8, Rol.CLIENTE);
+            usuario.setEstado(estado);
+            usuario.setPassword(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder()
+                    .encode("clave-segura"));
+            when(usuarioRepository.findByCorreo(usuario.getCorreo())).thenReturn(Optional.of(usuario));
+            var resultado = mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"correo\":\"usuario8@vitavet.test\",\"password\":\"clave-segura\"}"))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.message").isString())
+                    .andExpect(jsonPath("$.token").doesNotExist())
+                    .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header()
+                            .doesNotExist("Set-Cookie"))
+                    .andReturn();
+            org.junit.jupiter.api.Assertions.assertNull(resultado.getRequest().getSession(false));
+        }
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void loginIncorrectoNoRevelaEstadoNiExistencia() throws Exception {
+        Usuario usuario = usuario(8, Rol.CLIENTE);
+        usuario.setEstado(EstadoUsuario.PENDIENTE);
+        usuario.setPassword("clave-segura");
+        when(usuarioRepository.findByCorreo(usuario.getCorreo())).thenReturn(Optional.of(usuario));
+        for (String correo : List.of(usuario.getCorreo(), "inexistente@vitavet.test")) {
+            mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"correo\":\"" + correo + "\",\"password\":\"incorrecta\"}"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.message").value("Correo o contraseña incorrectos"))
+                    .andExpect(jsonPath("$.token").doesNotExist());
+        }
+    }
+
+    @Test
+    void loginAdminActivoConservaAccesoAdministrativo() throws Exception {
+        Usuario admin = usuario(6, Rol.ADMIN);
+        admin.setEstado(EstadoUsuario.ACTIVO);
+        admin.setPassword(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder()
+                .encode("clave-segura"));
+        when(usuarioRepository.findByCorreo(admin.getCorreo())).thenReturn(Optional.of(admin));
+        when(usuarioRepository.findAll()).thenReturn(List.of(admin));
+        var resultado = mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"correo\":\"usuario6@vitavet.test\",\"password\":\"clave-segura\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.rol").value("ADMIN")).andReturn();
+        String jwt = new tools.jackson.databind.ObjectMapper()
+                .readTree(resultado.getResponse().getContentAsString()).get("token").asString();
+        mockMvc.perform(get("/api/usuarios").header("Authorization", bearer(jwt)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void registroPublicoCodificaPasswordYFijaPrivilegiosSinExponerPassword() throws Exception {
+        mockMvc.perform(post("/api/auth/registro").contentType(MediaType.APPLICATION_JSON)
+                        .content(REGISTRO.replace("}", ",\"rol\":\"ADMIN\",\"estado\":\"ACTIVO\",\"nombreUsuario\":\"impuesto\"}")))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.password").doesNotExist());
+        ArgumentCaptor<Usuario> captor = ArgumentCaptor.forClass(Usuario.class);
+        verify(usuarioRepository).saveAndFlush(captor.capture());
+        Usuario creado = captor.getValue();
+        org.junit.jupiter.api.Assertions.assertEquals("Sofia", creado.getNombre());
+        org.junit.jupiter.api.Assertions.assertEquals("Perez", creado.getApellido());
+        org.junit.jupiter.api.Assertions.assertTrue(creado.getNombreUsuario().matches("u_[0-9a-f]{32}"));
+        org.junit.jupiter.api.Assertions.assertEquals(Rol.CLIENTE, creado.getRol());
+        org.junit.jupiter.api.Assertions.assertEquals(EstadoUsuario.PENDIENTE, creado.getEstado());
+        org.junit.jupiter.api.Assertions.assertTrue(
+                new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder()
+                        .matches("clave-segura", creado.getPassword()));
+    }
+
+    @Test
+    void registroRechazaCamposInvalidosSinGuardar() throws Exception {
+        var mapper = new tools.jackson.databind.ObjectMapper();
+        for (String campo : List.of("nombre", "apellido", "dni", "correo", "telefono", "password")) {
+            for (String valor : List.of("", " ", "x".repeat(256))) {
+                var json = mapper.readTree(REGISTRO).deepCopy();
+                ((tools.jackson.databind.node.ObjectNode) json).put(campo, valor);
+                mockMvc.perform(post("/api/auth/registro").contentType(MediaType.APPLICATION_JSON)
+                                .content(mapper.writeValueAsString(json)))
+                        .andExpect(status().isBadRequest());
+            }
+            var json = mapper.readTree(REGISTRO).deepCopy();
+            ((tools.jackson.databind.node.ObjectNode) json).remove(campo);
+            mockMvc.perform(post("/api/auth/registro").contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(json)))
+                    .andExpect(status().isBadRequest());
+        }
+        for (String invalido : List.of(REGISTRO.replace("sofia@example.com", "correo-invalido"),
+                REGISTRO.replace("clave-segura", "corta"),
+                REGISTRO.replace("clave-segura", "\u00e1".repeat(37)))) {
+            mockMvc.perform(post("/api/auth/registro").contentType(MediaType.APPLICATION_JSON).content(invalido))
+                    .andExpect(status().isBadRequest());
+        }
+        verify(usuarioRepository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    void registroRechazaCadaIdentidadDuplicada() throws Exception {
+        when(usuarioRepository.existsByDni("12345678")).thenReturn(true);
+        comprobarConflictoRegistro();
+        when(usuarioRepository.existsByDni("12345678")).thenReturn(false);
+        when(usuarioRepository.existsByCorreo("sofia@example.com")).thenReturn(true);
+        comprobarConflictoRegistro();
+        verify(usuarioRepository, never()).saveAndFlush(any());
+    }
+
+    private void comprobarConflictoRegistro() throws Exception {
+        mockMvc.perform(post("/api/auth/registro").contentType(MediaType.APPLICATION_JSON).content(REGISTRO))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.message").isString());
+    }
+
+    @Test
+    void registroCapturaConflictoConcurrenteSinExponerSql() throws Exception {
+        when(usuarioRepository.saveAndFlush(any())).thenThrow(
+                new DataIntegrityViolationException("SQL detalle interno secreto"));
+        mockMvc.perform(post("/api/auth/registro").contentType(MediaType.APPLICATION_JSON).content(REGISTRO))
+                .andExpect(status().isConflict())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+                        .string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("SQL"))));
+    }
+
+    @Test
+    void registroSoloAbrePostEnRutaExacta() throws Exception {
+        mockMvc.perform(get("/api/auth/registro")).andExpect(status().isUnauthorized());
+        mockMvc.perform(put("/api/auth/registro")).andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/auth/otra")).andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/auth/registro/extra")).andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/usuarios").contentType(MediaType.APPLICATION_JSON).content(REGISTRO))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/usuarios").header("Authorization", bearer(token(8, Rol.CLIENTE)))
+                        .contentType(MediaType.APPLICATION_JSON).content(REGISTRO))
+                .andExpect(status().isForbidden());
+        verify(usuarioRepository, never()).saveAndFlush(any());
+    }
 
     @Test
     void endpointsPrivadosRechazanSolicitudesSinJwtYConJwtInvalido() throws Exception {

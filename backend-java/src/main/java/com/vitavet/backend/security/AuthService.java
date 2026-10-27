@@ -6,8 +6,10 @@ import java.security.MessageDigest;
 import com.vitavet.backend.dto.AuthResponse;
 import com.vitavet.backend.dto.LoginRequest;
 import com.vitavet.backend.model.Usuario;
+import com.vitavet.backend.model.EstadoUsuario;
 import com.vitavet.backend.repository.UsuarioRepository;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,14 +47,23 @@ public class AuthService {
             passwordMatches = MessageDigest.isEqual(
                     request.password().getBytes(StandardCharsets.UTF_8),
                     storedPassword.getBytes(StandardCharsets.UTF_8));
-            if (passwordMatches) {
-                usuario.setPassword(passwordEncoder.encode(request.password()));
-                usuarioRepository.save(usuario);
-            }
         }
 
         if (!passwordMatches) {
             throw new BadCredentialsException("Correo o contraseña incorrectos");
+        }
+
+        // Solo revelar el estado una vez comprobadas las credenciales.
+        if (usuario.getEstado() != EstadoUsuario.ACTIVO) {
+            String mensaje = usuario.getEstado() == EstadoUsuario.PENDIENTE
+                    ? "Tu cuenta está pendiente de activación. No puedes iniciar sesión todavía."
+                    : "Tu cuenta no está activa. No puedes iniciar sesión. Contacta con administración.";
+            throw new DisabledException(mensaje);
+        }
+
+        if (!isBcryptHash(storedPassword)) {
+            usuario.setPassword(passwordEncoder.encode(request.password()));
+            usuarioRepository.save(usuario);
         }
 
         return new AuthResponse(

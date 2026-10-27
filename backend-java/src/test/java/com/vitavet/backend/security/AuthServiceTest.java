@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.spy;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.time.Instant;
 
@@ -15,6 +17,7 @@ import tools.jackson.databind.ObjectMapper;
 import com.vitavet.backend.dto.AuthResponse;
 import com.vitavet.backend.dto.LoginRequest;
 import com.vitavet.backend.model.Rol;
+import com.vitavet.backend.model.EstadoUsuario;
 import com.vitavet.backend.model.Usuario;
 import com.vitavet.backend.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
@@ -45,6 +49,7 @@ class AuthServiceTest {
     private BCryptPasswordEncoder passwordEncoder;
     private JwtDecoder jwtDecoder;
     private AuthService authService;
+    private JwtService jwtService;
 
     @BeforeEach
     void setUp() {
@@ -57,7 +62,8 @@ class AuthServiceTest {
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
         passwordEncoder = new BCryptPasswordEncoder();
-        authService = new AuthService(usuarioRepository, passwordEncoder, new JwtService(jwtEncoder, 3600));
+        jwtService = spy(new JwtService(jwtEncoder, 3600));
+        authService = new AuthService(usuarioRepository, passwordEncoder, jwtService);
     }
 
     @Test
@@ -102,9 +108,12 @@ class AuthServiceTest {
     @Test
     void loginConHashBcryptNoVuelveAMigrarLaContrasena() {
         Usuario cliente = usuario(passwordEncoder.encode("clave-segura"));
+        cliente.setRol(Rol.CLIENTE);
         when(usuarioRepository.findByCorreo(cliente.getCorreo())).thenReturn(java.util.Optional.of(cliente));
 
-        authService.login(new LoginRequest(cliente.getCorreo(), "clave-segura"));
+        AuthResponse response = authService.login(new LoginRequest(cliente.getCorreo(), "clave-segura"));
+        assertEquals(Rol.CLIENTE, response.rol());
+        assertEquals("6", jwtDecoder.decode(response.token()).getSubject());
 
         verify(usuarioRepository, never()).save(cliente);
     }
@@ -137,6 +146,37 @@ class AuthServiceTest {
         usuario.setPassword(password);
         usuario.setTelefono("999999999");
         usuario.setRol(Rol.ADMIN);
+        usuario.setEstado(EstadoUsuario.ACTIVO);
         return usuario;
+    }
+
+    @Test
+    void estadosNoActivosNoEmitenTokenNiActualizanContrasenas() {
+        for (EstadoUsuario estado : new EstadoUsuario[] { EstadoUsuario.PENDIENTE, EstadoUsuario.ANULADO, null }) {
+            for (String password : new String[] { "clave-segura", passwordEncoder.encode("clave-segura") }) {
+                Usuario usuario = usuario(password);
+                usuario.setEstado(estado);
+                when(usuarioRepository.findByCorreo(usuario.getCorreo())).thenReturn(java.util.Optional.of(usuario));
+                assertThrows(DisabledException.class,
+                        () -> authService.login(new LoginRequest(usuario.getCorreo(), "clave-segura")));
+                assertEquals(password, usuario.getPassword());
+            }
+        }
+        verify(jwtService, never()).createToken(any());
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void passwordIncorrectaNoRevelaEstadoNiEmiteToken() {
+        for (EstadoUsuario estado : EstadoUsuario.values()) {
+            Usuario usuario = usuario(passwordEncoder.encode("clave-segura"));
+            usuario.setEstado(estado);
+            when(usuarioRepository.findByCorreo(usuario.getCorreo())).thenReturn(java.util.Optional.of(usuario));
+            var error = assertThrows(BadCredentialsException.class,
+                    () -> authService.login(new LoginRequest(usuario.getCorreo(), "incorrecta")));
+            assertEquals("Correo o contraseña incorrectos", error.getMessage());
+        }
+        verify(jwtService, never()).createToken(any());
+        verify(usuarioRepository, never()).save(any());
     }
 }

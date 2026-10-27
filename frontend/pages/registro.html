@@ -56,17 +56,30 @@
             contraseñas y aceptación de términos. -->
           <form id="registerForm" class="login-form" novalidate>
             <div class="form-group">
-              <label class="form-label" for="fullName">Nombre completo</label>
+              <label class="form-label" for="nombre">Nombre</label>
               <input
                 class="form-control"
-                id="fullName"
-                name="fullName"
+                id="nombre"
+                name="nombre"
                 type="text"
-                placeholder="Sofía Perez"
-                autocomplete="name"
+                placeholder="Ej. Juan"
+                autocomplete="given-name"
+                maxlength="50"
                 aria-describedby="registerFormMessage"
                 required
               />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="apellido">Apellido</label>
+              <input class="form-control" id="apellido" name="apellido" type="text" placeholder="Ej. Pérez García"
+                maxlength="50" autocomplete="family-name" aria-describedby="registerFormMessage" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="dni">DNI</label>
+              <input class="form-control" id="dni" name="dni" type="text" placeholder="99999999"
+                maxlength="20" autocomplete="off" aria-describedby="registerFormMessage" required />
             </div>
 
             <div class="form-group">
@@ -76,7 +89,8 @@
                 id="email"
                 name="email"
                 type="email"
-                placeholder="sofia.perez@email.com"
+                maxlength="100"
+                placeholder="ejemplo@gmail.com"
                 autocomplete="email"
                 aria-describedby="registerFormMessage"
                 required
@@ -90,7 +104,8 @@
                 id="phone"
                 name="phone"
                 type="tel"
-                placeholder="+51 999 999 999"
+                maxlength="20"
+                placeholder="987654321"
                 autocomplete="tel"
                 aria-describedby="registerFormMessage"
                 required
@@ -103,11 +118,13 @@
                 <input
                   class="form-control"
                   id="password"
+                  placeholder="Mínimo 8 caracteres"
                   name="password"
                   type="password"
                   autocomplete="new-password"
                   aria-describedby="registerFormMessage"
                   minlength="8"
+                  maxlength="72"
                   required
                 />
                 <button
@@ -131,11 +148,13 @@
                 <input
                   class="form-control"
                   id="passwordConfirmation"
+                  placeholder="Repita su contraseña"
                   name="passwordConfirmation"
                   type="password"
                   autocomplete="new-password"
                   aria-describedby="registerFormMessage"
                   minlength="8"
+                  maxlength="72"
                   required
                 />
                 <button

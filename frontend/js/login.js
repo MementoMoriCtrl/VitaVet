@@ -98,6 +98,16 @@ loginForm.addEventListener("submit", async (event) => {
       return;
     }
 
+    if (response.status === 403) {
+      let message = "Tu cuenta no está activa. No puedes iniciar sesión. Contacta con administración.";
+      try {
+        const data = await response.json();
+        if (typeof data.message === "string" && data.message.trim()) message = data.message;
+      } catch { /* Mantener el mensaje si el servidor no devuelve JSON. */ }
+      setFormMessage(message);
+      return;
+    }
+
     if (!response.ok) {
       setFormMessage("No se pudo iniciar sesión. Inténtalo de nuevo.");
       return;
