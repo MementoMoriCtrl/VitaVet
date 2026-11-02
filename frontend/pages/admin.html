@@ -16,6 +16,7 @@
     <script src="../js/auth.js"></script>
     <script src="../js/admin.js" defer></script>
     <script src="../js/admin-usuarios.js" defer></script>
+    <script src="../js/catalogos.js" defer></script>
     <script src="../js/admin-mascotas.js" defer></script>
     <script src="../js/admin-veterinarios.js" defer></script>
     <script src="../js/admin-servicios.js" defer></script>
@@ -242,10 +243,11 @@
     <dialog class="admin-user-dialog" id="petDialog" aria-labelledby="petDialogTitle">
       <form id="petForm" class="admin-user-form">
         <h2 id="petDialogTitle">Nueva mascota</h2>
+        <p id="petCatalogMessage" class="admin-user-form-note" role="status" aria-live="polite" hidden></p>
         <label>Nombre<input name="nombre" type="text" maxlength="50" required /></label>
-        <label>Tipo<input name="tipo" type="text" maxlength="30" required /></label>
+        <label>Tipo de animal<select name="tipo" required><option value="">Selecciona una opción</option></select></label>
         <label>Raza<input name="raza" type="text" maxlength="50" required /></label>
-        <label>Sexo<input name="sexo" type="text" maxlength="20" required /></label>
+        <label>Sexo<select name="sexo" required><option value="">Selecciona una opción</option></select></label>
         <label>Edad<input name="edad" type="number" min="0" step="1" required /></label>
         <label>Propietario<select name="idUsuario" required><option value="">Selecciona un propietario</option></select></label>
         <div class="admin-user-form-actions">

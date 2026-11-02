@@ -3,6 +3,7 @@ package com.vitavet.backend.controller;
 import com.vitavet.backend.model.Mascota;
 import com.vitavet.backend.repository.MascotaRepository;
 import com.vitavet.backend.security.JwtIdentity;
+import com.vitavet.backend.service.CatalogoService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,11 @@ import java.util.List;
 public class MascotaController {
 
     private final MascotaRepository mascotaRepository;
+    private final CatalogoService catalogos;
 
-    public MascotaController(MascotaRepository mascotaRepository) {
+    public MascotaController(MascotaRepository mascotaRepository, CatalogoService catalogos) {
         this.mascotaRepository = mascotaRepository;
+        this.catalogos = catalogos;
     }
 
     @GetMapping
@@ -37,6 +40,7 @@ public class MascotaController {
 
     @PostMapping
     public Mascota registrarMascota(@RequestBody Mascota mascota, @AuthenticationPrincipal Jwt jwt) {
+        validarCatalogos(mascota);
         if (!JwtIdentity.isAdmin(jwt)) {
             mascota.setIdUsuario(JwtIdentity.userId(jwt));
         }
@@ -51,6 +55,7 @@ public class MascotaController {
 
         return buscarPorIdentidad(id, jwt)
                 .map(mascota -> {
+                    validarCatalogos(datosMascota);
                     if (JwtIdentity.isAdmin(jwt)) {
                         mascota.setIdUsuario(datosMascota.getIdUsuario());
                     }
@@ -79,5 +84,10 @@ public class MascotaController {
         return JwtIdentity.isAdmin(jwt)
                 ? mascotaRepository.findById(id)
                 : mascotaRepository.findByIdMascotaAndIdUsuario(id, JwtIdentity.userId(jwt));
+    }
+
+    private void validarCatalogos(Mascota mascota) {
+        catalogos.validar("tipo_animal", mascota.getTipo(), 30);
+        catalogos.validar("sexo", mascota.getSexo(), 20);
     }
 }

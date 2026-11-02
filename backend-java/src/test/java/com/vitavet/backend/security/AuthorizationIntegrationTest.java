@@ -53,6 +53,75 @@ import org.mockito.ArgumentCaptor;
 @AutoConfigureMockMvc
 class AuthorizationIntegrationTest {
 
+    @MockitoBean
+    private com.vitavet.backend.repository.OpcionCatalogoRepository opcionesCatalogo;
+
+    @org.junit.jupiter.api.BeforeEach
+    void catalogosExistentes() {
+        when(opcionesCatalogo.existsByCategoriaAndEtiqueta("tipo_animal", "Perro")).thenReturn(true);
+        when(opcionesCatalogo.existsByCategoriaAndEtiqueta("sexo", "Hembra")).thenReturn(true);
+    }
+
+    @Test
+    void catalogosDevuelvenOpcionesDeRepositorioYExigenAdmin() throws Exception {
+        String[][] rutas = {{"tipos-animal", "tipo_animal", "Perro"},
+                {"sexos", "sexo", "Hembra"}};
+        for (String[] ruta : rutas) {
+            when(opcionesCatalogo.findByCategoriaOrderByIdAsc(ruta[1])).thenReturn(List.of(
+                    new com.vitavet.backend.model.OpcionCatalogo(1, ruta[1], ruta[2])));
+            String url = "/api/catalogos/" + ruta[0];
+            mockMvc.perform(get(url)).andExpect(status().isUnauthorized());
+            mockMvc.perform(get(url).header("Authorization", bearer(token(8, Rol.CLIENTE))))
+                    .andExpect(status().isForbidden());
+            mockMvc.perform(get(url).header("Authorization", bearer(token(6, Rol.ADMIN))))
+                    .andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(1))
+                    .andExpect(jsonPath("$[0].etiqueta").value(ruta[2]));
+        }
+        mockMvc.perform(post("/api/catalogos/sexos").header("Authorization", bearer(token(6, Rol.ADMIN))))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    void mascotasRechazanOpcionesAjenasAlCatalogoEnAltaYEdicion() throws Exception {
+        when(mascotaRepository.findById(21)).thenReturn(Optional.of(mascota(21, 8)));
+        String valido = "{\"idUsuario\":8,\"nombre\":\"Luna\",\"tipo\":\"Perro\",\"raza\":\"Mestiza\",\"sexo\":\"Hembra\",\"edad\":4}";
+        for (String json : List.of(valido.replace("Perro", "Inexistente"), valido.replace("Hembra", "Inexistente"))) {
+            mockMvc.perform(post("/api/mascotas").header("Authorization", bearer(token(6, Rol.ADMIN)))
+                            .contentType(MediaType.APPLICATION_JSON).content(json))
+                    .andExpect(status().isBadRequest());
+            mockMvc.perform(put("/api/mascotas/21").header("Authorization", bearer(token(6, Rol.ADMIN)))
+                            .contentType(MediaType.APPLICATION_JSON).content(json))
+                    .andExpect(status().isBadRequest());
+        }
+        verify(mascotaRepository, never()).save(any());
+    }
+
+    @Test
+    void catalogoEspecialidadesRetiradoNoExponeDatos() throws Exception {
+        String url = "/api/catalogos/especialidades";
+        mockMvc.perform(get(url)).andExpect(status().isUnauthorized());
+        mockMvc.perform(get(url).header("Authorization", bearer(token(8, Rol.CLIENTE))))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get(url).header("Authorization", bearer(token(6, Rol.ADMIN))))
+                .andExpect(status().isNotFound());
+        org.mockito.Mockito.verifyNoInteractions(opcionesCatalogo);
+    }
+
+    @Test
+    void veterinariosAceptanEspecialidadLibreSinConsultarCatalogos() throws Exception {
+        String json = "{\"nombre\":\"Ana\",\"apellido\":\"Vega\",\"especialidad\":\"Medicina interna\",\"correo\":\"ana@vitavet.test\",\"telefono\":\"999999999\"}";
+        when(veterinarioRepository.findById(1)).thenReturn(Optional.of(new Veterinario()));
+        String auth = bearer(token(6, Rol.ADMIN));
+        when(veterinarioRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+        mockMvc.perform(post("/api/veterinarios").header("Authorization", auth)
+                        .contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.especialidad").value("Medicina interna"));
+        mockMvc.perform(put("/api/veterinarios/1").header("Authorization", auth)
+                        .contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.especialidad").value("Medicina interna"));
+        org.mockito.Mockito.verifyNoInteractions(opcionesCatalogo);
+    }
+
     @Autowired
     private MockMvc mockMvc;
 

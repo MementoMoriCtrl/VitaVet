@@ -14,6 +14,8 @@
   let clients = [];
   let clientById = new Map();
   let editingId = null;
+  let cargandoCatalogos = false;
+  let catalogosListos = false;
 
   const showFeedback = (message, isError = false) => {
     feedback.textContent = message;
@@ -132,17 +134,33 @@
     }
   };
 
-  const openForm = (pet = null) => {
+  const openForm = async (pet = null) => {
+    if (cargandoCatalogos) return;
+    cargandoCatalogos = true;
+    catalogosListos = false;
     editingId = pet?.idMascota ?? null;
     form.reset();
     title.textContent = editingId ? "Editar mascota" : "Nueva mascota";
     form.elements.nombre.value = pet?.nombre || "";
-    form.elements.tipo.value = pet?.tipo || "";
     form.elements.raza.value = pet?.raza || "";
-    form.elements.sexo.value = pet?.sexo || "";
     form.elements.edad.value = pet?.edad ?? "";
     ownerSelect.value = pet?.idUsuario == null ? "" : String(pet.idUsuario);
     dialog.showModal();
+    const saveButton = form.querySelector('[type="submit"]');
+    const message = document.querySelector("#petCatalogMessage");
+    saveButton.disabled = true;
+    message.hidden = false;
+    message.textContent = "Cargando opciones...";
+    const resultados = await Promise.allSettled([
+      window.VitaVetCatalogos.cargar(form.elements.tipo, "tipos-animal", pet?.tipo || ""),
+      window.VitaVetCatalogos.cargar(form.elements.sexo, "sexos", pet?.sexo || "")
+    ]);
+    cargandoCatalogos = false;
+    const fallo = resultados.find((resultado) => resultado.status === "rejected");
+    catalogosListos = !fallo;
+    saveButton.disabled = !catalogosListos;
+    message.textContent = fallo ? fallo.reason.message : "";
+    message.hidden = !fallo;
   };
 
   const editPet = async (id) => {
@@ -178,6 +196,7 @@
   document.querySelector("#cancelPetButton").addEventListener("click", () => dialog.close());
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (!catalogosListos || !form.reportValidity()) return;
     const age = form.elements.edad.valueAsNumber;
     if (!Number.isInteger(age) || age < 0) {
       showFeedback("La edad debe ser un número entero igual o mayor que cero.", true);

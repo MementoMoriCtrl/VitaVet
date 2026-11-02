@@ -156,6 +156,7 @@
   document.querySelector("#cancelVeterinarianButton").addEventListener("click", () => dialog.close());
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (!form.reportValidity()) return;
     const payload = {
       nombre: form.elements.nombre.value.trim(),
       apellido: form.elements.apellido.value.trim(),
